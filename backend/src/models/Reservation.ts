@@ -40,7 +40,7 @@ export interface IReservation extends Document {
   amountCents: number;
 
   // Payment provider fields
-  paymentProvider: "stripe" | "mock";
+  paymentProvider: "stripe" | "mock" | "worldpay";
   paymentIntentId?: string;    // Stripe PaymentIntent ID or mock equivalent
   idempotencyKey: string;      // keyed on reservationId – prevents duplicate charges
 
@@ -74,7 +74,7 @@ const ReservationSchema = new Schema<IReservation>(
     },
     amountCents:      { type: Number, required: true, min: 0 },
 
-    paymentProvider:  { type: String, enum: ["stripe","mock"], required: true },
+    paymentProvider:  { type: String, enum: ["stripe","mock","worldpay"], required: true },
     paymentIntentId:  { type: String, index: true, sparse: true },
     idempotencyKey:   { type: String, required: true, unique: true },
 

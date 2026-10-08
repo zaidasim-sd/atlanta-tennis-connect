@@ -23,6 +23,7 @@ export interface ReservationDTO {
   amountCents: number;
   paymentIntentId?: string;
   clientSecret?: string;
+  paymentProvider: "stripe" | "mock" | "worldpay";
   status: ReservationStatus;
   expiresAt: string;
   flaggedForReview?: boolean;
@@ -37,6 +38,7 @@ function toDTO(r: IReservation): ReservationDTO {
     paymentStatus: ["paid", "registered"].includes(r.status) ? "paid" : "pending",
     amountCents: r.amountCents,
     paymentIntentId: r.paymentIntentId,
+    paymentProvider: r.paymentProvider,
     status: r.status,
     expiresAt: r.expiresAt.toISOString(),
     flaggedForReview: r.flaggedForReview,
@@ -77,7 +79,7 @@ async function ensurePayment(r: IReservation) {
 
 export async function createReservation(
   input: CreateReservationInput,
-): Promise<{ reservation: ReservationDTO; clientSecret?: string }> {
+): Promise<{ reservation: ReservationDTO; clientSecret?: string; checkoutUrl?: string }> {
   const provider = getPaymentProvider(); // Validate configuration before taking capacity.
   await Reservation.init(); // Ensure the active-registration unique index exists.
   await expireReservations();
@@ -220,7 +222,7 @@ export async function createReservation(
     await cancelReservation(fresh._id.toString(), "expired");
     throw error("This reservation has expired. Please reserve again.");
   }
-  return { reservation: toDTO(fresh), clientSecret: payment.clientSecret };
+  return { reservation: toDTO(fresh), clientSecret: payment.clientSecret, checkoutUrl: payment.checkoutUrl };
 }
 
 // Status and capacity change in ONE transaction. Conditional transitions prevent
@@ -299,6 +301,7 @@ export async function confirmPayment(
   }
   // Read current provider state rather than trusting stale/out-of-order events.
   const provider = getPaymentProvider();
+  if (r.paymentProvider !== provider.name) throw error("Reservation uses a different payment provider", 409);
   let result = await provider.retrievePayment(paymentIntentId);
   if (result.amountCents !== r.amountCents) throw error("Payment amount mismatch", 409);
   if (result.status === "authorized") {
@@ -343,6 +346,7 @@ export async function cancelReservation(
     throw error("Payment has already succeeded; your registration is confirmed");
   if (!PENDING.includes(r.status)) return { released: true };
   const provider = getPaymentProvider();
+  if (r.paymentProvider !== provider.name) throw error("Reservation uses a different payment provider", 409);
   // Recover ambiguous creation failures before releasing. Never release a slot
   // while an associated payment can still succeed.
   if (!r.paymentIntentId) await ensurePayment(r);
@@ -379,7 +383,7 @@ export async function resumeCheckout(id: string) {
   if (!PENDING.includes(reservation.status)) return { reservation };
   const r = await findReservation(id);
   const payment = await ensurePayment(r);
-  return { reservation, clientSecret: payment.clientSecret };
+  return { reservation, clientSecret: payment.clientSecret, checkoutUrl: payment.checkoutUrl };
 }
 export async function getPlayerReservations(email: string): Promise<ReservationDTO[]> {
   return (

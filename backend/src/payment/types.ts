@@ -1,6 +1,6 @@
 /**
  * PaymentProvider interface – ported from the Stripe PoC.
- * Both StripeProvider and MockProvider implement this contract.
+ * StripeProvider, WorldpayProvider, and MockProvider implement this contract.
  * The reservation layer only talks to this interface; it never
  * imports Stripe or mock internals directly.
  */
@@ -29,6 +29,7 @@ export interface CreatePaymentInput {
 
 export interface CreatePaymentResult {
   paymentIntentId: string;
+  checkoutUrl?: string;
   clientSecret?: string;   // undefined for mock provider
   status: PaymentStatus;
 }
@@ -61,7 +62,7 @@ export interface WebhookEventResult {
  * Core interface every payment adapter must implement.
  */
 export interface PaymentProvider {
-  readonly name: "stripe" | "mock";
+  readonly name: "stripe" | "mock" | "worldpay";
 
   /** Initiate a payment. Idempotent on reservationId. */
   createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult>;

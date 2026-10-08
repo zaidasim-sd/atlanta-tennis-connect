@@ -20,7 +20,7 @@ const router = Router();
 router.post("/:reservationId/checkout", requireAuth, requireReservationOwner, wrap(async (req, res) => {
   const id = String(req.params.reservationId);
   res.setHeader("Cache-Control", "no-store");
-  ok(res, { ...await resumeCheckout(id), publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY });
+  ok(res, { ...await resumeCheckout(id), publishableKey: getPaymentProvider().name === "stripe" ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY : undefined });
 }));
 
 // POST /api/payments/webhook

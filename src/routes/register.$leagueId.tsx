@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { WorldpayCheckout } from "@/components/worldpay-checkout";
 import { StripeCheckoutForm } from "@/components/stripe-checkout-form";
 import { BallLoader } from "@/components/tennis-ball";
 
@@ -39,6 +40,8 @@ export const Route = createFileRoute("/register/$leagueId")({
 
 interface ActiveReservation {
   id: string;
+  paymentProvider?: "stripe" | "mock" | "worldpay";
+  checkoutUrl?: string;
   clientSecret?: string;
   publishableKey: string;
   expiresAt: string;
@@ -221,9 +224,10 @@ function RegisterLeague() {
           sessionStorage.removeItem(storageKey);
           setSuccess(true);
           void refreshFromDb();
-        } else if (json.data.clientSecret) {
+        } else if (json.data.clientSecret || json.data.checkoutUrl) {
           setReservation({
             ...json.data.reservation,
+            checkoutUrl: json.data.checkoutUrl,
             clientSecret: json.data.clientSecret,
             publishableKey: json.data.publishableKey,
           });
@@ -412,12 +416,13 @@ function RegisterLeague() {
       if (data && data.reservation) {
         setReservation({
           ...data.reservation,
-          clientSecret: data.clientSecret || `mock_secret_${data.reservation.id}`,
-          publishableKey: data.publishableKey || "pk_test_mock",
+          checkoutUrl: data.checkoutUrl,
+          clientSecret: data.clientSecret,
+          publishableKey: data.publishableKey,
           amountCents: effectiveFeeCents,
         });
         sessionStorage.setItem(storageKey, data.reservation.id);
-        toast.success("Spot held! Enter your payment card details below.");
+        toast.success("Spot held! Complete your secure checkout below.");
         return;
       }
     } catch (e: any) {
@@ -1023,7 +1028,12 @@ function RegisterLeague() {
             </div>
           )}
 
-          {reservation && reservation.clientSecret ? (
+          {reservation?.checkoutUrl ? (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h3 className="font-bold text-lg mb-5">Secure Worldpay Checkout</h3>
+              <WorldpayCheckout reservationId={reservation.id} checkoutUrl={reservation.checkoutUrl} onSuccess={handlePaymentSuccess} onCancel={handleCancelReservation} />
+            </div>
+          ) : reservation && reservation.clientSecret ? (
             <div className="rounded-2xl border border-border bg-card p-6 shadow-md shadow-black/[0.04]">
               <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
                 <div className="flex items-center gap-2 text-primary">

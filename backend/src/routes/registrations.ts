@@ -100,8 +100,9 @@ router.post(
     const { leagueId, playerEmail, partnerEmail } = parsed.data;
     if (!ownsEmail(req, playerEmail)) return err(res, "You can only register your own account", 403);
 
-    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (process.env.PAYMENT_PROVIDER !== "mock" && !publishableKey?.startsWith("pk_")) {
+    const publishableKey = (process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase() === "stripe"
+      ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY : undefined;
+    if ((process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase() === "stripe" && !publishableKey?.startsWith("pk_")) {
       return err(res, "Stripe checkout is not configured. Please contact the organizer.", 503);
     }
 
