@@ -304,6 +304,7 @@ export async function confirmPayment(
   if (r.paymentProvider !== provider.name) throw error("Reservation uses a different payment provider", 409);
   let result = await provider.retrievePayment(paymentIntentId);
   if (result.amountCents !== r.amountCents) throw error("Payment amount mismatch", 409);
+  if (result.currency && result.currency.toLowerCase() !== "usd") throw error("Payment currency mismatch", 409);
   if (result.status === "authorized") {
     if (!PENDING.includes(r.status) || r.expiresAt.getTime() <= Date.now()) {
       await cancelReservation(r._id.toString(), "expired");
@@ -321,6 +322,8 @@ export async function confirmPayment(
     result = await provider.retrievePayment(paymentIntentId);
   }
   if (result.status === "paid") {
+    if (result.amountCents !== r.amountCents || (result.currency && result.currency.toLowerCase() !== "usd"))
+      throw error("Payment amount or currency mismatch", 409);
     if (["cancelled", "expired", "failed"].includes(r.status))
       throw error("Paid payment requires manual review: reservation already released", 409);
     await transition(r, "registered", webhookEventId);
@@ -328,6 +331,9 @@ export async function confirmPayment(
     await transition(r, "cancelled", webhookEventId);
   } else if (result.status === "failed" && r.paymentProvider === "mock") {
     await transition(r, "failed", webhookEventId);
+  } else if (result.status === "failed" && r.paymentProvider === "worldpay") {
+    // Close the retryable hosted session before releasing a declined payment's spot.
+    await cancelReservation(r.id, "failed");
   }
 }
 async function findReservation(id: string) {
@@ -339,7 +345,7 @@ async function findReservation(id: string) {
 }
 export async function cancelReservation(
   id: string,
-  reason: "cancelled" | "expired" = "cancelled",
+  reason: "cancelled" | "expired" | "failed" = "cancelled",
 ): Promise<{ released: boolean }> {
   const r = await findReservation(id);
   if (["paid", "registered"].includes(r.status))

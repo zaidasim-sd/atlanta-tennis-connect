@@ -1,6 +1,6 @@
-import { createHash } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import { XMLBuilder, XMLParser } from "fast-xml-parser";
-import { WorldpayPayment } from "./worldpayPayment";
+import { WorldpayPayment, WorldpayObservation, WorldpayOperation } from "./worldpayPayment";
 import type {
   PaymentProvider,
   CreatePaymentInput,
@@ -33,6 +33,11 @@ function findAll(value: any, key: string): any[] {
     k === key ? (Array.isArray(v) ? v : [v]) : findAll(v, key),
   );
 }
+export class WorldpayRequestError extends Error {
+  constructor(readonly code: string, readonly providerMessage: string) {
+    super(`Worldpay request failed (code ${code})`);
+  }
+}
 export function parseExpressResponse(xml: string, allowNoRecords = false): any {
   if (/<!DOCTYPE|<!ENTITY/i.test(xml)) throw new Error("Invalid Worldpay response");
   const response = findAll(parser.parse(xml), "Response")[0];
@@ -43,8 +48,17 @@ export function parseExpressResponse(xml: string, allowNoRecords = false): any {
     return { ...response, ReportingData: "" };
   }
   if (!response || String(response.ExpressResponseCode) !== "0")
-    throw new Error(`Worldpay request failed (code ${response?.ExpressResponseCode ?? "unknown"})`);
+    throw new WorldpayRequestError(String(response?.ExpressResponseCode ?? "unknown"), String(response?.ExpressResponseMessage ?? ""));
   return response;
+}
+
+export function expressAmount(value: unknown): number {
+  const text = String(value);
+  if (!/^\d+\.\d{2}$/.test(text)) throw new Error("Invalid Worldpay transaction amount");
+  const [whole, fraction] = text.split(".");
+  const cents = Number(whole) * 100 + Number(fraction);
+  if (!Number.isSafeInteger(cents)) throw new Error("Invalid Worldpay transaction amount");
+  return cents;
 }
 export function worldpayStatus(code: string): PaymentStatus {
   switch (String(code)) {
@@ -80,11 +94,14 @@ export class WorldpayProvider implements PaymentProvider {
   };
   private prefix: string;
   private returnOrigin: string;
+  private merchantCurrency: string;
   constructor() {
     const environment = process.env.WORLDPAY_ENVIRONMENT ?? "sandbox";
     if (!["sandbox", "production"].includes(environment))
       throw new Error("Invalid WORLDPAY_ENVIRONMENT");
     this.prefix = environment === "sandbox" ? "cert" : "";
+    this.merchantCurrency = (process.env.WORLDPAY_MERCHANT_CURRENCY ?? (environment === "sandbox" ? "USD" : required("WORLDPAY_MERCHANT_CURRENCY"))).toUpperCase();
+    if (this.merchantCurrency !== "USD") throw new Error("Worldpay Express adapter requires a USD merchant account");
     this.returnOrigin = new URL(
       process.env.WORLDPAY_RETURN_ORIGIN || required("CLIENT_URL"),
     ).origin;
@@ -141,7 +158,7 @@ export class WorldpayProvider implements PaymentProvider {
     let payment = await WorldpayPayment.findById(id);
     if (!payment) {
       try {
-        payment = await WorldpayPayment.create({ _id: id, amountCents: input.amountCents });
+        payment = await WorldpayPayment.create({ _id: id, amountCents: input.amountCents, reservationId: input.reservationId, orderReference: input.reservationId, currency: this.merchantCurrency });
       } catch (e) {
         if ((e as { code?: number }).code !== 11000) throw e;
         payment = await this.payment(id);
@@ -170,6 +187,7 @@ export class WorldpayProvider implements PaymentProvider {
         const setupId = findAll(result, "TransactionSetupID")[0];
         if (!setupId) throw new Error("Worldpay did not return a checkout session");
         payment.setupId = String(setupId);
+        payment.validationCode = result.TransactionSetup?.ValidationCode;
         await payment.save();
       }
     }
@@ -196,19 +214,58 @@ export class WorldpayProvider implements PaymentProvider {
     if (result.ReportingData === undefined) throw new Error("Worldpay reporting data is missing");
     return findAll(data, "Item");
   }
-  async retrievePayment(id: string): Promise<RetrievePaymentResult> {
+  private async verifiedTransactions(id: string) {
     const payment = await this.payment(id);
     const transactions = await this.query(payment.setupId!);
-    const successful = transactions.filter((t) =>
+    const orderReference = payment.orderReference ?? id.slice("worldpay_".length);
+    for (const t of transactions) {
+      if (!t.TransactionID || t.ReferenceNumber !== orderReference)
+        throw new Error("Worldpay transaction order reference mismatch");
+      if (t.TransactionSetupID && t.TransactionSetupID.toUpperCase() !== payment.setupId!.toUpperCase())
+        throw new Error("Worldpay checkout session mismatch");
+      if ((t.AccountID && t.AccountID !== this.credentials.AccountID) || (t.AcceptorID && t.AcceptorID !== this.credentials.AcceptorID))
+        throw new Error("Worldpay merchant account mismatch");
+      const reportedCurrency = t.CurrencyCode ?? t.Currency;
+      const currency = reportedCurrency === "840" ? "USD" : String(reportedCurrency ?? this.merchantCurrency).toUpperCase();
+      if (currency !== (payment.currency ?? "USD")) throw new Error("Worldpay transaction currency mismatch");
+      const amountCents = expressAmount(t.ApprovedAmount ?? t.TransactionAmount);
+      const fields = {
+        paymentId: id, reservationId: payment.reservationId ?? orderReference,
+        transactionId: String(t.TransactionID), orderReference, currency,
+        currencySource: reportedCurrency ? "provider" : "merchant_configuration",
+        amountCents, providerStatus: String(t.TransactionStatus ?? ""),
+        providerStatusCode: String(t.TransactionStatusCode), transactionType: String(t.TransactionType ?? ""),
+        providerEventTime: String(t.TimeStamp ?? `${t.ExpressTransactionDate ?? ""} ${t.ExpressTransactionTime ?? ""}`).trim(),
+        providerTimezone: String(t.ExpressTransactionTimezone ?? "not_supplied"),
+      };
+      const eventId = createHash("sha256").update(JSON.stringify(fields)).digest("hex");
+      await WorldpayObservation.updateOne({ _id: eventId }, { $setOnInsert: { ...fields, verifiedAt: new Date() } }, { upsert: true });
+    }
+    return { payment, transactions };
+  }
+  private selectPayment(transactions: any[]) {
+    const payments = transactions.filter(t => !/Return|Refund|Credit|Void|Reversal/i.test(String(t.TransactionType ?? "").replace(/^CreditCard/, "Card")));
+    const successful = payments.filter((t) =>
       ["1", "5", "6", "15"].includes(String(t.TransactionStatusCode)),
     );
-    if (successful.length > 1)
+    const distinct = new Set(successful.map(t => t.TransactionID));
+    if (distinct.size > 1)
       throw new Error("Multiple Worldpay transactions require manual review");
-    const transaction = successful[0] ?? transactions[transactions.length - 1];
+    return successful[successful.length - 1] ?? payments[payments.length - 1];
+  }
+  async retrievePayment(id: string): Promise<RetrievePaymentResult> {
+    const { payment, transactions } = await this.verifiedTransactions(id);
+    const transaction = this.selectPayment(transactions);
     const amount = transaction
-      ? Math.round(Number(transaction.ApprovedAmount ?? transaction.TransactionAmount) * 100)
+      ? expressAmount(transaction.ApprovedAmount ?? transaction.TransactionAmount)
       : payment.amountCents;
-    if (!Number.isSafeInteger(amount)) throw new Error("Invalid Worldpay transaction amount");
+    if (transaction && amount !== payment.amountCents) throw new Error("Worldpay payment amount mismatch");
+    const observed = transaction ? await WorldpayObservation.findOne({ paymentId: id, transactionId: transaction.TransactionID }).sort({ verifiedAt: -1 }) : null;
+    await WorldpayPayment.updateOne({ _id: id }, { $set: {
+      reservationId: payment.reservationId ?? id.slice("worldpay_".length), orderReference: payment.orderReference ?? id.slice("worldpay_".length),
+      currency: payment.currency ?? this.merchantCurrency, verifiedAt: new Date(),
+      ...(transaction ? { transactionId: transaction.TransactionID, providerStatus: transaction.TransactionStatus ?? "", providerStatusCode: transaction.TransactionStatusCode, providerEventTime: observed?.providerEventTime, currencySource: observed?.currencySource } : {}),
+    } });
     return {
       paymentIntentId: id,
       status:
@@ -219,41 +276,84 @@ export class WorldpayProvider implements PaymentProvider {
             ? "cancelled"
             : "payment_pending",
       amountCents: amount,
+      currency: (payment.currency ?? this.merchantCurrency).toLowerCase(),
     };
   }
   private async action(id: string, method: string, amountCents?: number) {
-    const payment = await this.payment(id);
-    const transactions = await this.query(payment.setupId!);
-    const transaction = transactions[transactions.length - 1];
+    const { payment, transactions } = await this.verifiedTransactions(id);
+    const transaction = this.selectPayment(transactions);
     if (!transaction?.TransactionID) throw new Error("Worldpay transaction not available");
-    return this.request(method, {
+    if (expressAmount(transaction.ApprovedAmount ?? transaction.TransactionAmount) !== payment.amountCents)
+      throw new Error("Worldpay payment amount mismatch");
+    let transactionId = transaction.TransactionID;
+    if (method === "CreditCardReturn") {
+      if (!payment.captureTransactionId && String(transaction.TransactionStatusCode) === "6") {
+        // Completion has its own TransactionID. Older builds did not persist it,
+        // and sent an extra underscore in the completion's ReferenceNumber.
+        // Recover only a uniquely linked completion, never an unrelated charge.
+        const format = (date: Date) => date.toISOString().slice(0,19).replace("T", " ");
+        const start = new Date(payment.createdAt!.getTime() - 86400000);
+        const end = new Date(Date.now() + 86400000);
+        const candidates: any[] = [];
+        for (const reference of [id.slice("worldpay_".length), `_${id.slice("worldpay_".length)}`]) {
+          const report = await this.request("TransactionQuery", { Parameters: { ReferenceNumber: reference, TransactionDateTimeBegin: format(start), TransactionDateTimeEnd: format(end) } }, true);
+          const data = typeof report.ReportingData === "string" ? parser.parse(report.ReportingData) : report.ReportingData;
+          candidates.push(...findAll(data, "Item").filter(t =>
+            t.OriginalTransactionID === transaction.TransactionID && t.TransactionType === "CreditCardAuthorizationCompletion" &&
+            t.ReferenceNumber === reference && (!t.AccountID || t.AccountID === this.credentials.AccountID) &&
+            (!t.AcceptorID || t.AcceptorID === this.credentials.AcceptorID) &&
+            expressAmount(t.TransactionAmount) === payment.amountCents));
+        }
+        if (candidates.length !== 1) throw new Error("Worldpay capture reference requires manual review");
+        payment.captureTransactionId = candidates[0].TransactionID;
+        await payment.save();
+      }
+      transactionId = payment.captureTransactionId ?? transactionId;
+    }
+    const result = await this.request(method, {
       IdempotencyKey: operationKey(`${method}_${id}_${amountCents ?? payment.amountCents}`),
       Transaction: {
-        TransactionID: transaction.TransactionID,
+        TransactionID: transactionId,
         TransactionAmount: ((amountCents ?? payment.amountCents) / 100).toFixed(2),
-        ReferenceNumber: id.slice(8),
+        ReferenceNumber: id.slice("worldpay_".length),
         TicketNumber: id.slice(-6),
         MarketCode: "3",
+        ...(method === "CreditCardReversal" ? { ReversalType: "1" } : {}),
       },
       Terminal: this.terminal(),
     });
+    if (method === "CreditCardAuthorizationCompletion") {
+      if (!result.Transaction?.TransactionID) throw new Error("Worldpay capture transaction reference missing");
+      await WorldpayPayment.updateOne({ _id: id }, { $set: { captureTransactionId: String(result.Transaction.TransactionID) } });
+    }
+    return result;
   }
   async capturePayment(id: string): Promise<void> {
-    if ((await this.retrievePayment(id)).status === "paid") return;
+    const state = await this.retrievePayment(id);
+    if (state.status === "paid") return;
+    if (state.status !== "authorized") throw new Error("Worldpay payment is not authorized");
     await this.action(id, "CreditCardAuthorizationCompletion");
   }
   async cancelPayment(id: string): Promise<void> {
     const payment = await this.payment(id);
     if (!payment.cancelled) {
-      await this.request("TransactionSetupExpire", {
-        TransactionSetup: { TransactionSetupID: payment.setupId },
-      });
+      try {
+        await this.request("TransactionSetupExpire", {
+          TransactionSetup: { TransactionSetupID: payment.setupId },
+        });
+      } catch (error) {
+        // Express removes consumed/expired sessions. Only a known missing setup
+        // beyond its documented ten minute lifetime is safe to treat as closed.
+        const naturallyExpired = payment.createdAt && Date.now() - payment.createdAt.getTime() >= 10 * 60_000;
+        if (!(naturallyExpired && error instanceof WorldpayRequestError && error.code === "103" && error.providerMessage === "TransactionSetupID not found")) throw error;
+      }
       payment.cancelled = true;
       await payment.save();
     }
     const status = (await this.retrievePayment(id)).status;
-    if (status === "authorized") await this.action(id, "CreditCardVoid");
+    if (status === "authorized") await this.action(id, "CreditCardReversal");
     else if (status === "paid") throw new Error("Worldpay payment has already succeeded");
+    else if (status !== "cancelled") throw new Error("Worldpay payment cancellation is not yet verified");
   }
   async refundPayment(input: RefundPaymentInput): Promise<RefundPaymentResult> {
     const payment = await this.payment(input.paymentIntentId);
@@ -264,8 +364,35 @@ export class WorldpayProvider implements PaymentProvider {
         input.amountCents > payment.amountCents)
     )
       throw new Error("Invalid refund amount");
-    const result = await this.action(input.paymentIntentId, "CreditCardReturn", input.amountCents);
-    return { refundId: String(result.Transaction?.TransactionID ?? ""), status: "succeeded" };
+    const amountCents = input.amountCents ?? payment.amountCents;
+    const operationId = operationKey(`CreditCardReturn_${input.paymentIntentId}_${amountCents}`);
+    const previous = await WorldpayOperation.findById(operationId);
+    if (previous?.status === "succeeded") return { refundId: previous.transactionId!, status: "succeeded" };
+    const lock = await WorldpayPayment.findOneAndUpdate({ _id: payment.id, $or: [{ refundLock: { $exists: false } }, { refundLock: operationId }] }, { $set: { refundLock: operationId } });
+    if (!lock) throw new Error("Another Worldpay refund is unresolved");
+    const refunds = await WorldpayOperation.find({ paymentId: payment.id, type: "refund", status: "succeeded" });
+    if (refunds.reduce((sum, r) => sum + (r.amountCents ?? 0), 0) + amountCents > payment.amountCents) {
+      await WorldpayPayment.updateOne({ _id: payment.id, refundLock: operationId }, { $unset: { refundLock: 1 } });
+      throw new Error("Refund exceeds the remaining payment amount");
+    }
+    await WorldpayOperation.updateOne({ _id: operationId }, { $setOnInsert: { paymentId: payment.id, type: "refund", amountCents, status: "pending" } }, { upsert: true });
+    const result = await this.action(input.paymentIntentId, "CreditCardReturn", amountCents);
+    if (!result.Transaction?.TransactionID) throw new Error("Worldpay refund transaction reference missing");
+    const refundId = String(result.Transaction.TransactionID);
+    await WorldpayOperation.updateOne({ _id: operationId }, { $set: { transactionId: refundId, status: "succeeded", completedAt: new Date() } });
+    await WorldpayPayment.updateOne({ _id: payment.id, refundLock: operationId }, { $unset: { refundLock: 1 } });
+    return { refundId, status: "succeeded" };
+  }
+  async verifyCheckoutReturn(id: string, fields: Record<string, string>): Promise<void> {
+    const payment = await WorldpayPayment.findById(id).select("+validationCode");
+    const supplied = Buffer.from(fields.ValidationCode ?? "");
+    const expected = Buffer.from(payment?.validationCode ?? "");
+    if (!payment?.setupId || fields.TransactionSetupID?.toUpperCase() !== payment.setupId.toUpperCase() ||
+        !expected.length || supplied.length !== expected.length || !timingSafeEqual(supplied, expected))
+      throw new Error("Invalid Worldpay hosted return");
+    // Even a valid return cannot confirm a payment without a Reporting query.
+    await this.retrievePayment(id);
+    await WorldpayPayment.updateOne({ _id: id }, { $set: { returnVerifiedAt: new Date() } });
   }
   async parseWebhookEvent(): Promise<null> {
     // Express redirects are untrusted. Authenticated reconciliation and the cron

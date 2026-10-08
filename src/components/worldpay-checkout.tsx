@@ -17,8 +17,21 @@ export function WorldpayCheckout({
   useEffect(() => {
     let stopped = false;
     let timer: ReturnType<typeof setTimeout>;
+    const returnFields = new URLSearchParams(window.location.search);
+    let returnPending = returnFields.has("ValidationCode") || returnFields.has("TransactionSetupID");
     const verify = async () => {
       try {
+        if (returnPending) {
+          const returned = await fetch(getApiUrl(`/api/payments/${reservationId}/hosted-return`), {
+            method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ TransactionSetupID: returnFields.get("TransactionSetupID"), ValidationCode: returnFields.get("ValidationCode") }),
+          });
+          const result = await returned.json();
+          if (!returned.ok || !result.ok) throw new Error(result.error || "Could not verify the Worldpay return.");
+          returnPending = false;
+          // Remove provider response fields (including the validation code) from browser history.
+          window.history.replaceState(window.history.state, "", window.location.pathname);
+        }
         const response = await fetch(getApiUrl(`/api/payments/${reservationId}/reconcile`), {
           method: "POST",
           credentials: "include",

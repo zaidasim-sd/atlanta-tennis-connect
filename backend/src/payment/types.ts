@@ -38,6 +38,7 @@ export interface RetrievePaymentResult {
   paymentIntentId: string;
   status: PaymentStatus;
   amountCents: number;
+  currency?: string;
 }
 
 export interface RefundPaymentInput {
@@ -73,6 +74,9 @@ export interface PaymentProvider {
   /** Cancel an uncompleted payment. */
   cancelPayment?(paymentIntentId: string): Promise<void>;
   capturePayment?(paymentIntentId: string): Promise<void>;
+
+  /** Verify the product's browser return; this is not a server webhook. */
+  verifyCheckoutReturn?(paymentIntentId: string, fields: Record<string, string>): Promise<void>;
 
   /** Issue a full or partial refund. */
   refundPayment(input: RefundPaymentInput): Promise<RefundPaymentResult>;

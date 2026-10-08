@@ -85,7 +85,7 @@ test("registration identity comes from session; cross-player creation/list rejec
 });
 test("all payment routes and aliases reject anonymous and cross-player requests without side effects", async () => {
   const id = await reserve(); const calls = providerCalls;
-  for (const [path, method] of [[`/status/${id}`, "GET"], [`/${id}/checkout`, "POST"], [`/${id}/reconcile`, "POST"], [`/reconcile/${id}`, "POST"], [`/${id}/cancel`, "POST"], [`/cancel/${id}`, "POST"]]) {
+  for (const [path, method] of [[`/status/${id}`, "GET"], [`/${id}/checkout`, "POST"], [`/${id}/hosted-return`, "POST"], [`/${id}/reconcile`, "POST"], [`/reconcile/${id}`, "POST"], [`/${id}/cancel`, "POST"], [`/cancel/${id}`, "POST"]]) {
     assert.equal((await request(`/api/payments${path}`, { method })).status, 401);
     const denied = await request(`/api/payments${path}`, { method, who: "b" });
     assert.equal(denied.status, 404); assert.equal(denied.body.data, undefined);

@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-08T09:37:39.916Z",
+  "environment": "sandbox",
+  "operation": "reconcile",
+  "reference": "worldpay_6ac73799002db8be709a3ae5",
+  "before": {
+    "providerStatus": "paid",
+    "amountCents": 3500,
+    "currency": "usd",
+    "reservationStatus": "registered",
+    "spotsRemaining": 5,
+    "confirmedRegistrations": 21,
+    "transactions": [
+      {
+        "id": "674877821",
+        "orderReference": "6ac73799002db8be709a3ae5",
+        "amountCents": 3500,
+        "status": "Declined",
+        "type": "CreditCardAuthorization",
+        "eventTime": "2026-10-08T01:27:40.370",
+        "verifiedAt": "2026-10-08T09:31:05.990Z",
+        "currency": "USD",
+        "currencySource": "merchant_configuration"
+      },
+      {
+        "id": "674877822",
+        "orderReference": "6ac73799002db8be709a3ae5",
+        "amountCents": 3500,
+        "status": "AuthCompleted",
+        "type": "CreditCardAuthorization",
+        "eventTime": "2026-10-08T01:27:50.070",
+        "verifiedAt": "2026-10-08T09:31:06.094Z",
+        "currency": "USD",
+        "currencySource": "merchant_configuration"
+      }
+    ]
+  },
+  "result": {
+    "first": "registered",
+    "replay": "registered"
+  },
+  "after": {
+    "providerStatus": "paid",
+    "amountCents": 3500,
+    "currency": "usd",
+    "reservationStatus": "registered",
+    "spotsRemaining": 5,
+    "confirmedRegistrations": 21,
+    "transactions": [
+      {
+        "id": "674877821",
+        "orderReference": "6ac73799002db8be709a3ae5",
+        "amountCents": 3500,
+        "status": "Declined",
+        "type": "CreditCardAuthorization",
+        "eventTime": "2026-10-08T01:27:40.370",
+        "verifiedAt": "2026-10-08T09:31:05.990Z",
+        "currency": "USD",
+        "currencySource": "merchant_configuration"
+      },
+      {
+        "id": "674877822",
+        "orderReference": "6ac73799002db8be709a3ae5",
+        "amountCents": 3500,
+        "status": "AuthCompleted",
+        "type": "CreditCardAuthorization",
+        "eventTime": "2026-10-08T01:27:50.070",
+        "verifiedAt": "2026-10-08T09:31:06.094Z",
+        "currency": "USD",
+        "currencySource": "merchant_configuration"
+      }
+    ]
+  }
+}

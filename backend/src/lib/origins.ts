@@ -4,9 +4,7 @@ export function allowedOrigin(origin: string, host?: string) {
   if (host && (origin === `https://${host}` || origin === `http://${host}`)) return true;
   const configured = [process.env.CLIENT_URL, ...(process.env.ALLOWED_ORIGINS || "").split(",")].filter(Boolean);
   if (configured.some(value => value!.trim().replace(/\/$/, "") === origin)) return true;
-  if (/\.vercel\.app$/.test(origin)) return true;
-  // Always allow localhost and 127.0.0.1 on any port for local development & staging preview
-  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  // Preview hosts and local origins must be explicitly configured too.
   return false;
 }
 // Origin checks complement authentication and prevent cookie-based CSRF.

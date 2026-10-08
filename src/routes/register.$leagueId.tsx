@@ -1092,7 +1092,7 @@ function RegisterLeague() {
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">Payment Processor</span>
-                  <span className="font-medium">Stripe Checkout / Safe Test Payment</span>
+                  <span className="font-medium">Secure hosted checkout</span>
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">League Entry Fee</span>
@@ -1144,7 +1144,7 @@ function RegisterLeague() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Lock className="size-3.5 text-primary shrink-0" />
-                  <span>256-bit SSL encrypted Stripe payment processing</span>
+                  <span>Secure payment verification by our payment provider</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="size-3.5 text-primary shrink-0" />

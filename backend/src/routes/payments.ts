@@ -23,6 +23,23 @@ router.post("/:reservationId/checkout", requireAuth, requireReservationOwner, wr
   ok(res, { ...await resumeCheckout(id), publishableKey: getPaymentProvider().name === "stripe" ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY : undefined });
 }));
 
+// Express Hosted Payments documents a validated browser redirect, not a webhook.
+// Session ownership and a constant time ValidationCode check guard this endpoint;
+// registration still depends on independently querying the provider.
+router.post("/:reservationId/hosted-return", requireAuth, requireReservationOwner, wrap(async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const provider = getPaymentProvider();
+  if (!provider.verifyCheckoutReturn) return err(res, "Hosted return is unavailable", 400);
+  const fields = req.body;
+  if (!fields || typeof fields.TransactionSetupID !== "string" || typeof fields.ValidationCode !== "string" ||
+      fields.TransactionSetupID.length > 100 || fields.ValidationCode.length > 100)
+    return err(res, "Invalid hosted return", 400);
+  const r = await Reservation.findById(String(req.params.reservationId));
+  if (!r?.paymentIntentId || r.paymentProvider !== provider.name) return err(res, "Payment reservation unavailable", 409);
+  await provider.verifyCheckoutReturn(r.paymentIntentId, { TransactionSetupID: fields.TransactionSetupID, ValidationCode: fields.ValidationCode });
+  ok(res, await reconcileReservation(r.id));
+}));
+
 // POST /api/payments/webhook
 // express.raw() must be applied BEFORE this route so rawBody is a Buffer
 router.post("/webhook", async (req: Request, res: Response) => {

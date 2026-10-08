@@ -8,7 +8,7 @@ const {
   operationKey,
   parseExpressResponse,
 } = require("../dist/payment/worldpayProvider");
-const { WorldpayPayment } = require("../dist/payment/worldpayPayment");
+const { WorldpayPayment, WorldpayObservation, WorldpayOperation } = require("../dist/payment/worldpayPayment");
 let db, originalFetch, requests, state, setupFails;
 const input = {
   reservationId: "0123456789abcdef01234567",
@@ -32,7 +32,7 @@ after(async () => {
   await db?.stop();
 });
 beforeEach(async () => {
-  await WorldpayPayment.deleteMany({});
+  await Promise.all([WorldpayPayment.deleteMany({}), WorldpayObservation.deleteMany({}), WorldpayOperation.deleteMany({})]);
   requests = [];
   state = null;
   setupFails = false;
@@ -43,11 +43,11 @@ beforeEach(async () => {
     let fields = "";
     if (method === "TransactionSetup")
       fields =
-        "<TransactionSetup><TransactionSetupID>setup-123</TransactionSetupID></TransactionSetup>";
+        "<TransactionSetup><TransactionSetupID>setup-123</TransactionSetupID><ValidationCode>validation-123</ValidationCode></TransactionSetup>";
     if (method === "TransactionQuery")
-      fields = `<ReportingData>&lt;Items&gt;${state ? `&lt;Item&gt;&lt;TransactionID&gt;txn-123&lt;/TransactionID&gt;&lt;TransactionStatusCode&gt;${state}&lt;/TransactionStatusCode&gt;&lt;ApprovedAmount&gt;45.00&lt;/ApprovedAmount&gt;&lt;/Item&gt;` : ""}&lt;/Items&gt;</ReportingData>`;
-    if (method === "CreditCardAuthorizationCompletion") state = "6";
-    if (method === "CreditCardVoid") state = "4";
+      fields = `<ReportingData>&lt;Items&gt;${state ? `&lt;Item&gt;&lt;TransactionID&gt;txn-123&lt;/TransactionID&gt;&lt;ReferenceNumber&gt;0123456789abcdef01234567&lt;/ReferenceNumber&gt;&lt;TransactionType&gt;CreditCardAuthorization&lt;/TransactionType&gt;&lt;TransactionStatusCode&gt;${state}&lt;/TransactionStatusCode&gt;&lt;ApprovedAmount&gt;45.00&lt;/ApprovedAmount&gt;&lt;/Item&gt;` : ""}&lt;/Items&gt;</ReportingData>`;
+    if (method === "CreditCardAuthorizationCompletion") { state = "6"; fields = "<Transaction><TransactionID>capture-123</TransactionID></Transaction>"; }
+    if (method === "CreditCardReversal") state = "7";
     if (method === "CreditCardReturn")
       fields = "<Transaction><TransactionID>refund-123</TransactionID></Transaction>";
     return new Response(
@@ -89,7 +89,7 @@ test("server reports authorization and completes it before reporting paid", asyn
     /<IdempotencyKey>[a-f0-9-]{36}<\/IdempotencyKey>/,
   );
 });
-test("cancellation expires checkout and voids authorization", async () => {
+test("cancellation expires checkout and reverses authorization", async () => {
   const provider = new WorldpayProvider();
   const created = await provider.createPayment(input);
   state = "5";
@@ -102,12 +102,17 @@ test("a completed payment cannot be cancelled; refunds use the transaction ID", 
   const created = await provider.createPayment(input);
   state = "6";
   await assert.rejects(provider.cancelPayment(created.paymentIntentId), /already succeeded/);
+  await WorldpayPayment.updateOne({ _id: created.paymentIntentId }, { $set: { captureTransactionId: 'capture-123' } });
   const refund = await provider.refundPayment({
     paymentIntentId: created.paymentIntentId,
     amountCents: 2000,
   });
   assert.equal(refund.refundId, "refund-123");
   assert.match(requests.at(-1).body, /<TransactionAmount>20.00<\/TransactionAmount>/);
+  assert.match(requests.at(-1).body, /<TransactionID>capture-123<\/TransactionID>/);
+  const count = requests.length;
+  assert.deepEqual(await provider.refundPayment({ paymentIntentId: created.paymentIntentId, amountCents: 2000 }), refund);
+  assert.equal(requests.length, count);
 });
 test("unverified webhook and invalid responses cannot confirm payment", async () => {
   await assert.rejects(new WorldpayProvider().parseWebhookEvent(), /authenticated reconciliation/);
@@ -157,4 +162,66 @@ test('Reporting No Record(s) is pending only in query context', async () => {
   const result = await provider.retrievePayment(created.paymentIntentId);
   assert.equal(result.status, 'payment_pending');
   assert.equal(result.amountCents, input.amountCents);
+});
+
+test('reporting evidence is durable, linked, deduplicated and excludes card data', async () => {
+  const provider = new WorldpayProvider();
+  const created = await provider.createPayment(input);
+  state = '5';
+  await provider.retrievePayment(created.paymentIntentId);
+  await provider.retrievePayment(created.paymentIntentId);
+  const rows = await WorldpayObservation.find({}).lean();
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].transactionId, 'txn-123');
+  assert.equal(rows[0].reservationId, input.reservationId);
+  assert.equal(rows[0].amountCents, 4500);
+  assert.equal(rows[0].currency, 'USD');
+  assert.equal(rows[0].currencySource, 'merchant_configuration');
+  assert.ok(rows[0].verifiedAt);
+  assert.equal(rows[0].CardNumber, undefined);
+  const saved = await WorldpayPayment.findById(created.paymentIntentId);
+  assert.equal(saved.transactionId, 'txn-123');
+});
+
+test('reporting rejects wrong reference, amount and independently returned currency', async () => {
+  const provider = new WorldpayProvider();
+  const created = await provider.createPayment(input);
+  state = '5';
+  const original = global.fetch;
+  for (const [from, to, error] of [
+    ['0123456789abcdef01234567', 'unrelated-order', /reference mismatch/],
+    ['45.00', '44.00', /amount mismatch/],
+    ['&lt;ApprovedAmount&gt;', '&lt;CurrencyCode&gt;978&lt;/CurrencyCode&gt;&lt;ApprovedAmount&gt;', /currency mismatch/],
+  ]) {
+    global.fetch = async (...args) => {
+      const response = await original(...args);
+      return new Response((await response.text()).replace(from, to));
+    };
+    await assert.rejects(provider.retrievePayment(created.paymentIntentId), error);
+  }
+});
+
+test('hosted return requires matching validation code and session; replay never charges', async () => {
+  const provider = new WorldpayProvider();
+  const created = await provider.createPayment(input);
+  await assert.rejects(provider.verifyCheckoutReturn(created.paymentIntentId, { TransactionSetupID: 'setup-123', ValidationCode: 'forged' }), /Invalid/);
+  await assert.rejects(provider.verifyCheckoutReturn(created.paymentIntentId, { TransactionSetupID: 'other', ValidationCode: 'validation-123' }), /Invalid/);
+  const fields = { TransactionSetupID: 'setup-123', ValidationCode: 'validation-123' };
+  await provider.verifyCheckoutReturn(created.paymentIntentId, fields);
+  await provider.verifyCheckoutReturn(created.paymentIntentId, fields);
+  assert.equal((await provider.retrievePayment(created.paymentIntentId)).status, 'payment_pending');
+  assert.ok((await WorldpayPayment.findById(created.paymentIntentId)).returnVerifiedAt);
+  assert.equal(requests.filter(r => r.body.startsWith('<CreditCard')).length, 0);
+});
+
+test('provider outage retains cancellation state for safe retry', async () => {
+  const provider = new WorldpayProvider();
+  const created = await provider.createPayment(input);
+  const original = global.fetch;
+  global.fetch = async () => { throw Error('provider outage'); };
+  await assert.rejects(provider.cancelPayment(created.paymentIntentId), /outage/);
+  assert.equal((await WorldpayPayment.findById(created.paymentIntentId)).cancelled, false);
+  global.fetch = original;
+  await provider.cancelPayment(created.paymentIntentId);
+  assert.equal((await provider.retrievePayment(created.paymentIntentId)).status, 'cancelled');
 });
