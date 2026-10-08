@@ -100,15 +100,9 @@ export function LeagueCard({
           <p className="text-xs text-muted-foreground">per player, per season</p>
         </div>
         <Button asChild size="sm" variant={isRegistered || isClosed ? "outline" : "default"}>
-          {!user ? (
-            <Link to="/login" search={{ redirect: `/leagues/${league.id}` }}>
-              View Details <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
-          ) : (
-            <Link to="/leagues/$leagueId" params={{ leagueId: league.id }}>
-              {isRegistered ? "View Details" : isClosed ? "View details" : isFull ? "Full · View" : "Register"} <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Link>
-          )}
+          <Link to="/leagues/$leagueId" params={{ leagueId: league.id }}>
+            View Details <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
         </Button>
       </div>
     </article>

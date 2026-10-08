@@ -48,6 +48,44 @@ function finishLoading() {
 }
 
 describe("league browsing", () => {
+  it("shows six leagues at a time on mobile and resets after search changes", () => {
+    store.leagues = Array.from({ length: 14 }, (_, index) => ({
+      ...league, id: `league-${index}`, name: `League ${index}`,
+    }));
+    render(<BrowseLeagues />);
+    finishLoading();
+    expect(screen.getAllByRole("article")).toHaveLength(6);
+    fireEvent.click(screen.getByRole("button", { name: "Load more" }));
+    expect(screen.getAllByRole("article")).toHaveLength(12);
+    fireEvent.click(screen.getByRole("button", { name: "Load more" }));
+    expect(screen.getAllByRole("article")).toHaveLength(14);
+    expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
+    fireEvent.change(screen.getByRole("textbox", { name: "Search leagues" }), { target: { value: "League" } });
+    expect(screen.getAllByRole("article")).toHaveLength(6);
+  });
+
+  it("opens mobile filters in an accessible bottom sheet", () => {
+    render(<BrowseLeagues />);
+    finishLoading();
+    fireEvent.click(screen.getByRole("button", { name: "Filters" }));
+    expect(screen.getByRole("dialog", { name: "Filter leagues" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Show 1 league" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("sorts mobile leagues by price and skill level", () => {
+    store.leagues = [
+      { ...league, id: "high", name: "High", feeCents: 5000, skillLevel: "4.0" },
+      { ...league, id: "low", name: "Low", feeCents: 2000, skillLevel: "3.0" },
+    ];
+    render(<BrowseLeagues />);
+    finishLoading();
+    fireEvent.change(screen.getByRole("combobox", { name: "Sort leagues" }), { target: { value: "price" } });
+    expect(screen.getAllByRole("article")[0].textContent).toContain("Low");
+    fireEvent.change(screen.getByRole("combobox", { name: "Sort leagues" }), { target: { value: "skill" } });
+    expect(screen.getAllByRole("article")[0].textContent).toContain("Low");
+  });
+
   it("renders after a player signs in and filters by their profile skill", () => {
     const view = render(<BrowseLeagues />);
     finishLoading();
@@ -69,7 +107,7 @@ describe("league browsing", () => {
     finishLoading();
     // Area combobox is the 3rd combobox (format, skill, area)
     const comboboxes = screen.getAllByRole("combobox");
-    expect(comboboxes.length).toBe(3);
+    expect(comboboxes.length).toBe(4);
     expect(screen.getByText("All 1 leagues available across Atlanta")).toBeTruthy();
   });
 

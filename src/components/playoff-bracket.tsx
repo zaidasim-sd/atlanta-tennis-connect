@@ -8,7 +8,6 @@ import {
   ListTree,
   ChevronDown,
 } from "lucide-react";
-import { DemoBanner } from "@/components/demo-banner";
 import { cn } from "@/lib/utils";
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
@@ -380,10 +379,6 @@ export function PlayoffBracket() {
           </div>
         </div>
 
-        <DemoBanner
-          message="This tournament bracket is an interactive visual concept. Real-time bracket generation and court assignment logic is scheduled for Phase 5."
-          className="mb-6"
-        />
 
         {/* ════════════════════════════════════════════════════════════════════
             VIEW 1: VERTICAL FLOW (TAILORED SPECIALLY FOR MOBILE & PHONES)

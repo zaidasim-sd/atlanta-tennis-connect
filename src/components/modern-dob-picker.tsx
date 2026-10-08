@@ -84,17 +84,6 @@ export function ModernDobPicker({
     setOpen(false);
   };
 
-  const handlePreset = (targetAge: number) => {
-    const targetY = currentYear - targetAge;
-    setViewYear(targetY);
-    // Auto-select 1st of month or keep day if available
-    const d = selectedDay || 15;
-    setSelectedDay(d);
-    const mm = String(viewMonth + 1).padStart(2, "0");
-    const dd = String(d).padStart(2, "0");
-    onChange(`${targetY}-${mm}-${dd}`);
-  };
-
   // Formatted date for trigger display
   const formattedDisplay = React.useMemo(() => {
     if (!parsed) return null;
@@ -136,30 +125,6 @@ export function ModernDobPicker({
           align="start"
           sideOffset={6}
         >
-          {/* Quick presets for rapid navigation */}
-          <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-border/60">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Quick Age:
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handlePreset(25)}
-                className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-semibold text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                Adult (25)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handlePreset(15)}
-                className="rounded-md bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 px-2 py-0.5 text-[11px] font-semibold hover:bg-amber-500 hover:text-white transition-colors"
-              >
-                Junior (15)
-              </button>
-            </div>
-          </div>
-
           {/* Month & Year Selectors */}
           <div className="grid grid-cols-2 gap-2">
             {/* Month Select */}

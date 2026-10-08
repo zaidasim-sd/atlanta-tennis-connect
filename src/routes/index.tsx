@@ -1,16 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import {
-  ArrowRight,
-  Trophy,
-  Users,
-  Calendar,
-  Lock,
-  LogIn,
-  UserPlus,
-  ShieldCheck,
-  MapPin,
-} from "lucide-react";
+import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { LeagueCard } from "@/components/league-card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +10,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { DemoBanner } from "@/components/demo-banner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -64,7 +53,7 @@ function Index() {
             Real tennis. Real local.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/90 sm:text-xl font-medium drop-shadow-md">
-            Join organized tennis leagues across metro Atlanta. Create your profile, browse member leagues, and secure your registration online with instant confirmation.
+            Join organized tennis leagues across metro Atlanta. Browse full league details and current availability, then sign in to begin registration.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Button asChild size="lg" className="rounded-full font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl border-2 border-primary/20">
@@ -80,35 +69,42 @@ function Index() {
         </div>
       </section>
 
-      {/* Stats/Info Section */}
-      <section className="border-b border-border bg-card px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-3">
-          <div className="flex flex-col items-center text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
-              <Trophy className="size-6" />
-            </div>
-            <h3 className="mt-4 font-bold text-foreground">Competitive Play</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Find leagues tailored to your exact skill level, from casual 2.5 to competitive 5.0.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
-              <Users className="size-6" />
-            </div>
-            <h3 className="mt-4 font-bold text-foreground">League Types</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Men's Singles, Women's Singles, Men's Doubles, and Mixed Doubles across metro Atlanta.</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
-              <Calendar className="size-6" />
-            </div>
-            <h3 className="mt-4 font-bold text-foreground">Organized Seasons</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Spring, Summer, Fall, and Winter leagues organized across metro Atlanta communities.</p>
-          </div>
-        </div>
+      {/* Compact league features */}
+      <section aria-label="League features" className="border-b border-border bg-card px-4 py-6 sm:px-6 sm:py-12 lg:px-8">
+        <ul className="mx-auto grid max-w-6xl grid-cols-3 gap-2 sm:gap-8">
+          {[
+            {
+              icon: Trophy, title: "Competitive Play",
+              detail: "NTRP 2.5–5.0",
+              desktopDetail: "Find leagues tailored to your exact skill level, from casual 2.5 to competitive 5.0.",
+            },
+            {
+              icon: Users, title: "League Types",
+              detail: "Singles & doubles",
+              desktopDetail: "Men's Singles, Women's Singles, Men's Doubles, and Mixed Doubles across metro Atlanta.",
+            },
+            {
+              icon: Calendar, title: "Organized Seasons",
+              detail: "Year-round play",
+              desktopDetail: "Spring, Summer, Fall, and Winter leagues organized across metro Atlanta communities.",
+            },
+          ].map(({ icon: Icon, title, detail, desktopDetail }) => (
+            <li key={title} className="group/feature min-w-0 text-center">
+              <div className="flex flex-col items-center">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary text-primary transition-colors duration-300 group-hover/feature:bg-lime-200 motion-safe:transition-all motion-safe:group-hover/feature:-translate-y-1 motion-safe:group-hover/feature:scale-110 sm:size-12">
+                  <Icon className="size-5 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/feature:-rotate-6 sm:size-6" aria-hidden="true" />
+                </span>
+                <h3 className="mt-2 text-xs font-bold leading-snug text-foreground sm:mt-4 sm:text-base">{title}</h3>
+              </div>
+              <p className="mt-1 text-[11px] leading-snug text-muted-foreground sm:hidden">{detail}</p>
+              <p className="mt-2 hidden text-sm text-muted-foreground sm:block">{desktopDetail}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* Featured Leagues / Member Access Section */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-background">
+      {/* Featured Leagues */}
+      <section className="px-4 py-10 sm:py-16 sm:px-6 lg:px-8 bg-background">
         <div className="mx-auto max-w-6xl">
           <div>
             <div className="flex flex-wrap items-end justify-between gap-4">
@@ -121,12 +117,8 @@ function Index() {
               </Button>
             </div>
 
-            <DemoBanner
-              message="Featured leagues shown here are sample data for demonstration purposes only."
-              className="mt-6"
-            />
 
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featuredLeagues.map((league) => (
                 <LeagueCard
                   key={league.id}
@@ -140,15 +132,39 @@ function Index() {
         </div>
       </section>
 
+      {/* Short registration overview */}
+      <section className="border-t border-border px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">How it works</h2>
+          <ol className="mt-5 grid gap-4 sm:grid-cols-3">
+            {[
+              { title: "Find your league", body: "Review the format, level, venue, dates and price." },
+              { title: "Sign in & confirm details", body: "Choose Register, then sign in or create your player account." },
+              { title: "Complete registration", body: "Complete the payment step and check your registration status." },
+            ].map((step, index) => (
+              <li key={step.title} className="flex gap-3">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-primary">{index + 1}</span>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">{step.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <Link to="/how-it-works" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+            More about how it works <ArrowRight className="size-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* FAQ Section */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 border-t border-border">
+      <section className="px-4 py-10 sm:py-16 sm:px-6 lg:px-8 border-t border-border">
         <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Frequently Asked Questions</h2>
-            <p className="mt-4 text-lg text-muted-foreground">Everything you need to know about playing with Baseline ATL.</p>
+          <div className="text-center mb-5">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Quick questions</h2>
           </div>
           
-          <div className="mx-auto max-w-3xl rounded-2xl bg-card p-6 shadow-sm border border-border sm:p-10">
+          <div className="mx-auto max-w-3xl rounded-2xl bg-card p-4 shadow-sm border border-border sm:p-6">
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger className="text-base font-semibold hover:text-primary">How do I know my skill level?</AccordionTrigger>
@@ -156,28 +172,10 @@ function Index() {
                   We use the standard NTRP rating system (2.5 to 5.0). If you're a beginner, 2.5 is a great start. Intermediate players typically fall into 3.0 or 3.5, while advanced players compete at 4.0 and 4.5 or 5.0. You can easily select your level when creating your profile.
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-2">
+              <AccordionItem value="item-2" className="border-b-0">
                 <AccordionTrigger className="text-base font-semibold hover:text-primary">Where are the matches played?</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
                   Matches are hosted at top-tier tennis facilities across metro Atlanta. Specific venues vary by league and season. When you view a league's details, you'll see exactly which venue will host your matches.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger className="text-base font-semibold hover:text-primary">How does league registration work?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
-                  Browse available leagues by format, NTRP skill level, and metro area. Once you find the right fit, complete your registration and secure payment online to lock in your spot with instant confirmation.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-base font-semibold hover:text-primary">Do I need a partner for doubles?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
-                  You can register for Men's Doubles or Mixed Doubles leagues. Both partners complete their registration to reserve their spots in the league.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-5" className="border-b-0">
-                <AccordionTrigger className="text-base font-semibold hover:text-primary">When does the next season start?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm leading-relaxed">
-                  We run four major seasons year-round: Spring, Summer, Fall, and Winter. Registration typically opens 4 weeks before the season begins. Check the "Browse leagues" page to see what's currently enrolling!
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -186,17 +184,17 @@ function Index() {
       </section>
 
       {/* Bottom CTA */}
-      <section className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl bg-secondary px-6 py-16 text-center shadow-lg sm:px-12">
+      <section className="px-4 py-10 sm:py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl bg-secondary px-6 py-8 sm:py-12 text-center shadow-lg sm:px-12">
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Ready to hit the courts?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-            Create your player profile, find the right league for your skill level, and secure your spot today.
+          <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
+            Find the right league for your skill level and review the details before registering.
           </p>
-          <div className="mt-8 flex justify-center gap-4">
+          <div className="mt-5 flex justify-center gap-4">
             <Button asChild size="lg" className="rounded-full">
-              <Link to="/signup" search={{ leagueId: undefined }}>Create account</Link>
+              <Link to="/leagues">Find a league <ArrowRight className="size-4" /></Link>
             </Button>
           </div>
         </div>

@@ -205,7 +205,7 @@ function Dashboard() {
                   </div>
                   <h3 className="mt-3 text-base font-semibold text-foreground">No active registrations</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Discover open leagues across metro Atlanta and secure your spot today.
+                    Discover open leagues across metro Atlanta and begin your registration today.
                   </p>
                   <Button asChild className="mt-5 rounded-full" size="sm">
                     <Link to="/leagues">Find a league</Link>
@@ -537,7 +537,7 @@ function Dashboard() {
                           League entry confirmed.
                         </p>
                         <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
-                          Your spot in the league is secured. Your player registration and profile are active for the season.
+                          Your league registration is recorded. Check your registration details and status for the season.
                         </p>
                       </div>
                     );
@@ -574,7 +574,7 @@ function Dashboard() {
                       </div>
                       <h4 className="mt-3 text-base font-bold text-foreground">No active league registration</h4>
                       <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                        Browse open leagues across metro Atlanta and secure your registration today.
+                        Browse open leagues across metro Atlanta and begin your registration today.
                       </p>
                       <Button asChild className="mt-4 rounded-full" size="sm">
                         <Link to="/leagues">Find a league</Link>

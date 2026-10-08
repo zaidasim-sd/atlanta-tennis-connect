@@ -11,10 +11,10 @@ export const Route = createFileRoute("/how-it-works")({
       { title: "How Baseline ATL Works — Atlanta Tennis Leagues" },
       {
         name: "description",
-        content: "Four steps to Atlanta tennis leagues: register your account, browse leagues, secure your spot, and view your confirmed registrations.",
+        content: "Four steps to Atlanta tennis leagues: browse league details, sign in, complete registration, and view your registrations.",
       },
       { property: "og:title", content: "How Baseline ATL Works" },
-      { property: "og:description", content: "Register your account, browse leagues, secure your spot, and view your confirmed registrations." },
+      { property: "og:description", content: "Browse league details, sign in, complete registration, and view your registrations." },
     ],
   }),
   component: HowItWorks,
@@ -24,7 +24,7 @@ export const STEPS = [
   {
     icon: UserPlus,
     title: "Register your account",
-    body: "Create your free player profile with your skill level, ZIP code, and home area to unlock full access to all metro Atlanta leagues.",
+    body: "Create your free player profile with your skill level, ZIP code, and home area to register for a league after reviewing its public details.",
   },
   {
     icon: Search,
@@ -33,8 +33,8 @@ export const STEPS = [
   },
   {
     icon: CreditCard,
-    title: "Register and secure your spot",
-    body: "One fast registration with secure payment and instant confirmation. Your spot in the league is guaranteed immediately.",
+    title: "Complete your registration",
+    body: "Confirm your details and complete the current mock payment flow. Registration is confirmed once the process is completed.",
   },
   {
     icon: Trophy,
@@ -62,10 +62,10 @@ function HowItWorks() {
       <Reveal>
         <p className="eyebrow text-muted-foreground">How it works</p>
         <h1 className="mt-3 max-w-2xl text-4xl font-bold sm:text-5xl">
-          From account setup to confirmed registration in four steps.
+          Explore league details and complete registration in four steps.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          Baseline ATL handles league discovery, capacity control, and secure registration payments so players and organizers can focus on
+          Baseline ATL provides league details, current availability, and online registration so players and organizers can focus on
           the tennis.
         </p>
       </Reveal>

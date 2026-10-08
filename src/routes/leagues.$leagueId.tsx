@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { useStore } from "@/lib/store";
 import { FORMAT_LABELS, formatDate, formatDateRange, formatMoney } from "@/lib/tennis";
-import { DemoBanner } from "@/components/demo-banner";
 import { BallLoader } from "@/components/tennis-ball";
 
 export const Route = createFileRoute("/leagues/$leagueId")({
@@ -34,8 +33,8 @@ export const Route = createFileRoute("/leagues/$leagueId")({
 
 const ENROLLMENT_STEPS = [
   { time: "Step 1", title: "Review requirements", body: "Check the NTRP skill level, format, and venue location to confirm this league fits your game." },
-  { time: "Step 2", title: "Reserve your spot", body: "Complete your player registration and payment to lock in your place before capacity fills." },
-  { time: "Step 3", title: "Confirmed enrollment", body: "Receive instant registration confirmation and view your league entry in your dashboard." },
+  { time: "Step 2", title: "Reserve your spot", body: "Sign in or create an account, confirm your details, and complete the current mock payment flow." },
+  { time: "Step 3", title: "Confirmed enrollment", body: "Registration is confirmed once the process is completed. View your registration status in your dashboard." },
 ];
 
 function LeagueDetail() {
@@ -44,17 +43,12 @@ function LeagueDetail() {
   const { leagueById, seasonById, spotsLeft, registrationsForPlayer, user, hydrated } = useStore();
 
   React.useEffect(() => {
-    if (hydrated && !user) {
-      navigate({
-        to: "/login",
-        search: { redirect: `/leagues/${leagueId}` },
-      });
-    } else if (hydrated && user?.role === "organizer") {
+    if (hydrated && user?.role === "organizer") {
       navigate({ to: "/organizer" });
     }
   }, [hydrated, user, leagueId, navigate]);
 
-  if (!hydrated || (!user && hydrated) || user?.role === "organizer") {
+  if (!hydrated || user?.role === "organizer") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <BallLoader label="Loading league details..." />
@@ -131,7 +125,7 @@ function LeagueDetail() {
               How league registration works
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Simple, transparent 3-step registration with instant spot reservation.
+              Review league details, complete registration, and check your status.
             </p>
 
             <ol className="mt-5 space-y-3.5">
@@ -158,7 +152,7 @@ function LeagueDetail() {
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
               <p className="text-xs sm:text-sm leading-relaxed text-foreground/90">
-                Registration is limited to <strong className="font-semibold text-foreground">{league.playerLimit} players</strong> per league to ensure a balanced group with zero overselling. Once enrolled, your registration status and league details are immediately accessible in your dashboard.
+                Registration is limited to <strong className="font-semibold text-foreground">{league.playerLimit} players</strong> per league. Current availability is shown for each league. View your registration status and league details in your dashboard after completing the process.
               </p>
             </div>
           </div>
@@ -172,6 +166,8 @@ function LeagueDetail() {
               {[
                 { icon: CalendarDays, label: "Match night", value: `${league.scheduleDay}s at ${league.scheduleTime}` },
                 { icon: MapPin, label: "Venue", value: league.venue },
+                { icon: Trophy, label: "Format", value: formatLabel },
+                { icon: ShieldCheck, label: "Eligibility", value: `NTRP ${(league.offeredSkillLevels?.length ? league.offeredSkillLevels : [league.skillLevel]).join(", ")}${league.ageCategory ? ` · ${league.ageCategory} age category` : ""} · ${formatLabel}` },
                 {
                   icon: Clock,
                   label: "Season dates",
@@ -230,7 +226,7 @@ function LeagueDetail() {
             ) : canRegister ? (
               <Button asChild size="lg" className="mt-5 w-full rounded-full font-bold shadow-md shadow-primary/20">
                 <Link to="/register/$leagueId" params={{ leagueId: league.id }}>
-                  {user ? "Continue to payment →" : "Sign up and pay"}
+                  Register →
                 </Link>
               </Button>
             ) : (
@@ -239,9 +235,15 @@ function LeagueDetail() {
               </Button>
             )}
 
+            {!user && canRegister && (
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                Sign in or create an account to confirm your details and proceed to payment.
+              </p>
+            )}
+
             <p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <ShieldCheck className="size-4 text-primary" />
-              Secure payment · Full refund before week one
+              Mock payment flow · No real payment is taken
             </p>
 
             <Link

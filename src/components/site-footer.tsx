@@ -30,7 +30,7 @@ export function SiteFooter() {
           <p className="mt-3 max-w-sm text-sm leading-relaxed">
             {isOrganizer
               ? "Official league administration, roster holds, capacity management, and participant verification for Atlanta tennis organizers."
-              : "Organized tennis leagues across metro Atlanta. Clear league details, real-time capacity, and seamless online registration."}
+              : "Organized tennis leagues across metro Atlanta. Clear league details, current availability, and online registration."}
           </p>
         </div>
 
@@ -120,8 +120,8 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           {/* Demo disclaimer — single line, white */}
-          <p className="overflow-hidden whitespace-nowrap border-b border-white/10 py-3 text-center text-[10px] leading-relaxed text-white">
-            Demo Notice: This website is an MVP demonstration. All leagues, dates, prices, locations, availability, and other content shown are for demonstration purposes only and do not represent live data.
+          <p className="border-b border-white/10 py-3 text-center text-xs leading-relaxed text-white/70">
+            Demo: League information is for demonstration. Payments are currently mocked; no real money is charged.
           </p>
 
           {/* Copyright + Powered by */}

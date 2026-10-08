@@ -22,11 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Reveal } from "@/components/reveal";
 import { LeagueCard, LeagueCardSkeleton } from "@/components/league-card";
 import { useStore } from "@/lib/store";
 import { FORMAT_LABELS, SKILL_LEVELS, type LeagueFormat, type SkillLevel } from "@/lib/tennis";
-import { DemoBanner } from "@/components/demo-banner";
 
 export const Route = createFileRoute("/leagues/")({
   head: () => ({
@@ -92,6 +92,22 @@ function BrowseLeagues() {
   const [city, setCity] = React.useState<string>("all");
   const [query, setQuery] = React.useState("");
 
+  const [filtersOpen, setFiltersOpen] = React.useState(false);
+  const [visibleCount, setVisibleCount] = React.useState(6);
+  const [sort, setSort] = React.useState("soonest");
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const media = window.matchMedia("(max-width: 639px)");
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+
+  React.useEffect(() => { setVisibleCount(6); }, [format, skill, city, query, sort]);
+  React.useEffect(() => { if (!isMobile) setFiltersOpen(false); }, [isMobile]);
+
   // Keep skill state strictly synced with player profile
   React.useEffect(() => {
     if (playerSkill) {
@@ -151,65 +167,9 @@ function BrowseLeagues() {
     });
   }, [leagues, seasons, format, skill, playerSkill, city, query]);
 
-  if (hydrated && user?.role === "organizer") {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <ShieldCheck className="size-6 text-primary" />
-          </div>
-          <h2 className="mt-4 text-xl font-bold text-foreground">Organizer Access Only</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            As an organizer, you are restricted from player league views. Manage all leagues, rosters, and scores in the Organizer Hub.
-          </p>
-          <div className="mt-6 flex justify-center">
-            <Button asChild>
-              <Link to="/organizer">Go to Organizer Hub</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <section className="group relative overflow-hidden bg-black border-b border-border py-16 text-white sm:py-24">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1657534927924-a6fc6573a93e?q=80&w=1200&auto=format&fit=crop"
-            alt="Tennis match"
-            className="h-full w-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000 ease-out"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <Reveal>
-            <p className="eyebrow text-accent drop-shadow-md">Metro Atlanta Leagues</p>
-            <h1 className="mt-2 text-3xl font-bold sm:text-5xl drop-shadow-lg">Browse Leagues</h1>
-            <p className="mt-3 max-w-xl text-white/90 drop-shadow-md text-sm sm:text-base">
-              Explore official leagues across Atlanta by league type, skill rating, season, and metro area.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        {/* Modern Dropdown Filters */}
-        <Reveal className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:p-6 space-y-4">
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by league name, venue, or keywords..."
-              aria-label="Search leagues"
-              className="h-11 rounded-full pl-10 bg-background text-sm"
-            />
-          </div>
-
-          {/* 3 Professional Dropdowns */}
+  const filterControls = (
+    <>
+{/* 3 Professional Dropdowns */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {/* League Type Dropdown */}
             <div className="space-y-1.5">
@@ -299,6 +259,117 @@ function BrowseLeagues() {
               </Select>
             </div>
           </div>
+    </>
+  );
+
+  const activeFilterCount = Number(format !== "all") + Number(city !== "all") + Number((playerSkill || skill) !== "all");
+  const sortedResults = React.useMemo(() => {
+    if (!isMobile) return results;
+    return [...results].sort((a, b) => {
+      if (sort === "price") return a.feeCents - b.feeCents;
+      if (sort === "skill") return Number.parseFloat(a.skillLevel) - Number.parseFloat(b.skillLevel);
+      const startTime = (league: typeof a) => {
+        const date = league.startDate || seasons.find((season) => season.id === league.seasonId)?.startDate;
+        const time = date ? Date.parse(date) : NaN;
+        return Number.isFinite(time) ? time : Number.MAX_SAFE_INTEGER;
+      };
+      return startTime(a) - startTime(b);
+    });
+  }, [results, isMobile, sort, seasons]);
+  const visibleResults = isMobile ? sortedResults.slice(0, visibleCount) : sortedResults;
+
+  if (hydrated && user?.role === "organizer") {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShieldCheck className="size-6 text-primary" />
+          </div>
+          <h2 className="mt-4 text-xl font-bold text-foreground">Organizer Access Only</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            As an organizer, you are restricted from player league views. Manage all leagues, rosters, and scores in the Organizer Hub.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <Button asChild>
+              <Link to="/organizer">Go to Organizer Hub</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <section className="group relative overflow-hidden bg-black border-b border-border py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1657534927924-a6fc6573a93e?q=80&w=1200&auto=format&fit=crop"
+            alt="Tennis match"
+            className="h-full w-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000 ease-out"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/20" />
+        </div>
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <Reveal>
+            <p className="eyebrow text-accent drop-shadow-md">Metro Atlanta Leagues</p>
+            <h1 className="mt-2 text-3xl font-bold sm:text-5xl drop-shadow-lg">Browse Leagues</h1>
+            <p className="mt-3 max-w-xl text-white/90 drop-shadow-md text-sm sm:text-base">
+              Explore official leagues across Atlanta by league type, skill rating, season, and metro area.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        {/* Modern Dropdown Filters */}
+        <Reveal className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:p-6 space-y-4">
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by league name, venue, or keywords..."
+              aria-label="Search leagues"
+              className="h-11 rounded-full pl-10 bg-background text-sm"
+            />
+          </div>
+
+          <div className="hidden sm:block">{filterControls}</div>
+          <div className="flex items-center gap-3 sm:hidden">
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="h-11 shrink-0">
+                  <SlidersHorizontal className="size-4" /> Filters
+                  {activeFilterCount > 0 && <span className="rounded-full bg-secondary px-2 text-primary">{activeFilterCount}</span>}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-3xl pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+                <SheetHeader className="mb-6 text-left">
+                  <SheetTitle>Filter leagues</SheetTitle>
+                  <SheetDescription>Choose a league type, skill level and metro area.</SheetDescription>
+                </SheetHeader>
+                {filterControls}
+                <div className="mt-6 flex gap-3">
+                  <Button variant="outline" onClick={() => {
+                    setFormat("all"); setCity("all"); setSkill(playerSkill || "all");
+                  }}>Reset</Button>
+                  <Button className="flex-1" onClick={() => setFiltersOpen(false)}>
+                    Show {results.length} {results.length === 1 ? "league" : "leagues"}
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+            <label className="flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-foreground">
+              Sort
+              <select aria-label="Sort leagues" value={sort} onChange={(event) => setSort(event.target.value)} className="h-11 min-w-0 flex-1 rounded-xl border border-input bg-background px-2 text-sm">
+                <option value="soonest">Soonest</option>
+                <option value="price">Price: low to high</option>
+                <option value="skill">Skill level</option>
+              </select>
+            </label>
+          </div>
 
           {/* Player profile indicator */}
           {currentPlayer && (
@@ -326,10 +397,6 @@ function BrowseLeagues() {
           )}
         </Reveal>
 
-        <DemoBanner
-          message="All leagues, venues and fees shown are simulated for prototype demonstration."
-          className="mt-6"
-        />
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-medium text-muted-foreground" aria-live="polite">
@@ -394,7 +461,7 @@ function BrowseLeagues() {
 
         {status === "ready" && results.length > 0 && (
           <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((league, i) => (
+            {visibleResults.map((league, i) => (
               <Reveal key={league.id} delay={Math.min(i, 5) * 50} className="h-full">
                 <LeagueCard
                   league={league}
@@ -403,6 +470,15 @@ function BrowseLeagues() {
                 />
               </Reveal>
             ))}
+          </div>
+        )}
+
+        {status === "ready" && isMobile && results.length > 0 && (
+          <div className="mt-6 flex flex-col items-center gap-3 sm:hidden">
+            <p className="text-xs text-muted-foreground" aria-live="polite">Showing {visibleResults.length} of {results.length} leagues</p>
+            {visibleResults.length < results.length && (
+              <Button variant="outline" className="h-11 w-full" onClick={() => setVisibleCount((count) => count + 6)}>Load more</Button>
+            )}
           </div>
         )}
 

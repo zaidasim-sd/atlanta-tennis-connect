@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -12,57 +11,9 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { TennisBall } from "@/components/tennis-ball";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { StoreProvider } from "@/lib/store";
 
 import appCss from "../styles.css?url";
-
-const DISCLAIMER_LAST_SHOWN_KEY = "baseline-atl-disclaimer-last-shown";
-const DISCLAIMER_INTERVAL_MS = 24 * 60 * 60 * 1000;
-
-function DemoDisclaimer() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const now = Date.now();
-    const lastShown = Number(window.localStorage.getItem(DISCLAIMER_LAST_SHOWN_KEY));
-
-    if (!lastShown || now - lastShown >= DISCLAIMER_INTERVAL_MS) {
-      // Record when the notice is displayed so a refresh does not show it again.
-      window.localStorage.setItem(DISCLAIMER_LAST_SHOWN_KEY, String(now));
-      setIsOpen(true);
-    }
-  }, []);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-md gap-6 rounded-2xl border-border bg-card p-7 shadow-lift sm:p-8">
-        <DialogHeader className="items-center space-y-3 text-center sm:text-center">
-          <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
-            <TennisBall className="size-7" />
-          </span>
-          <DialogTitle className="font-display text-2xl font-bold text-foreground">
-            A quick note
-          </DialogTitle>
-          <DialogDescription className="max-w-sm text-base leading-relaxed text-muted-foreground">
-            All content and data shown are for demonstration purposes only.
-          </DialogDescription>
-        </DialogHeader>
-        <Button className="w-full" size="lg" onClick={() => setIsOpen(false)}>
-          Got it
-        </Button>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 function NotFoundComponent() {
   return (
@@ -169,7 +120,6 @@ function RootComponent() {
               </main>
               <SiteFooter />
             </div>
-            <DemoDisclaimer />
             <Toaster position="top-center" />
           </StoreProvider>
         </QueryClientProvider>

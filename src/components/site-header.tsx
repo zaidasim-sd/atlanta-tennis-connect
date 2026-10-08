@@ -223,9 +223,10 @@ export function SiteHeader() {
         </div>
 
         <button
-          className="inline-flex size-10 items-center justify-center rounded-full border border-border lg:hidden"
+          className="inline-flex size-10 items-center justify-center rounded-full border border-border text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="mobile-navigation"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -233,18 +234,19 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="animate-rise border-t border-border bg-background lg:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
+        <div className="border-t border-border bg-white text-slate-900 shadow-lg lg:hidden">
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
             {currentNavItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
                 activeOptions={{ exact: item.to === "/" || item.to === "/organizer" }}
-                activeProps={{ className: "text-primary bg-secondary" }}
-                className="rounded-lg px-3 py-3 text-base font-medium"
+                activeProps={{ className: "border-l-4 border-primary bg-secondary text-primary font-bold", "aria-current": "page" }}
+                inactiveProps={{ className: "border-l-4 border-transparent text-slate-900" }}
+                className="rounded-lg px-3 py-3 text-base font-semibold transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                {item.label}
+                {item.to === "/leagues" ? "Leagues" : item.label}
               </Link>
             ))}
             <div className="mt-2 flex flex-col gap-2">
@@ -298,14 +300,18 @@ export function SiteHeader() {
                 </Button>
               ) : (
                 <>
-                  <Button asChild onClick={() => setOpen(false)}>
-                    <Link to="/leagues">Find a league</Link>
-                  </Button>
-                  <Button asChild variant="outline" onClick={() => setOpen(false)}>
-                    <Link to="/signup" search={{ leagueId: undefined }}>Sign up</Link>
-                  </Button>
-                  <Button asChild variant="ghost" onClick={() => setOpen(false)}>
-                    <Link to="/login" search={{ leagueId: undefined }}>Sign in</Link>
+                  <Link
+                    to="/login"
+                    search={{ leagueId: undefined }}
+                    onClick={() => setOpen(false)}
+                    activeProps={{ className: "border-l-4 border-primary bg-secondary text-primary font-bold", "aria-current": "page" }}
+                    inactiveProps={{ className: "border-l-4 border-transparent text-slate-900" }}
+                    className="rounded-lg px-3 py-3 text-base font-semibold transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    Sign in
+                  </Link>
+                  <Button asChild className="mt-2 h-12 text-base" onClick={() => setOpen(false)}>
+                    <Link to="/signup" search={{ leagueId: undefined }} activeProps={{ "aria-current": "page" }}>Create account</Link>
                   </Button>
                 </>
               )}

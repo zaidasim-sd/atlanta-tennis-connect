@@ -126,7 +126,7 @@ function RealStripePaymentForm(props: Props) {
         {props.busy ? "Updating reservation…" : "Cancel reservation & release spot"}
       </Button>
       <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1">
-        <Lock className="size-3 text-primary" /> Payments are securely processed by Stripe.
+        <Lock className="size-3 text-primary" /> Payment processing is handled by the selected provider when enabled.
       </p>
     </form>
   );
@@ -210,7 +210,7 @@ function StripeInteractiveCardForm(props: Props) {
       {/* Reservation Timer */}
       <div className="flex justify-between items-center rounded-xl bg-primary/10 border border-primary/20 px-3.5 py-2.5 text-xs text-primary" aria-live="off">
         <span className="font-semibold flex items-center gap-1.5">
-          <Lock className="size-3.5" /> Spot Reserved
+          <Lock className="size-3.5" /> Registration session
         </span>
         <span className="font-mono font-bold text-sm">
           {String(Math.floor(remaining / 60000)).padStart(2, "0")}:
@@ -219,7 +219,7 @@ function StripeInteractiveCardForm(props: Props) {
       </div>
 
       <div className="rounded-lg bg-muted/60 border border-border/80 px-3 py-2 text-[11px] text-muted-foreground flex items-center justify-between">
-        <span>Stripe Sandbox / Test Mode</span>
+        <span>Mock payment — no real money is charged</span>
         <span className="font-mono font-bold text-primary">Test: 4242 •••• 4242</span>
       </div>
 
@@ -321,7 +321,7 @@ function StripeInteractiveCardForm(props: Props) {
         {processing ? (
           <span className="flex items-center gap-2">
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            Processing Stripe payment…
+            Processing mock payment…
           </span>
         ) : (
           `Pay ${formatMoney(props.amountCents)} & Complete Entry`
@@ -341,7 +341,7 @@ function StripeInteractiveCardForm(props: Props) {
 
       <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground pt-1">
         <ShieldCheck className="size-3.5 text-primary" />
-        <span>256-bit SSL encrypted · Powered by Stripe</span>
+        <span>Mock payment flow · Use test card details only</span>
       </div>
     </form>
   );

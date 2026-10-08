@@ -25,6 +25,7 @@ import {
   Plus,
   Users,
   Search,
+  SlidersHorizontal,
   Mail,
   Phone,
   Clock,
@@ -46,8 +47,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DemoBanner } from "@/components/demo-banner";
 import { BallLoader } from "@/components/tennis-ball";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -94,6 +95,13 @@ function OrganizerHub() {
   const [directScoreMatchId, setDirectScoreMatchId] = useState<string | null>(null);
   const [directScoreText, setDirectScoreText] = useState("6-4, 6-3");
   const [directWinnerId, setDirectWinnerId] = useState("");
+
+  const [leagueFiltersOpen, setLeagueFiltersOpen] = useState(false);
+  const [leagueQuery, setLeagueQuery] = useState("");
+  const [leagueStatus, setLeagueStatus] = useState("active");
+  const [leagueSeason, setLeagueSeason] = useState("all");
+  const [leagueType, setLeagueType] = useState("all");
+  const [leagueSort, setLeagueSort] = useState("status");
 
   // League Roster / Participant modal state
   const [selectedLeague, setSelectedLeague] = useState<League | null>(null);
@@ -204,6 +212,53 @@ function OrganizerHub() {
     return list;
   }, [allRegistrations, registrations, players]);
 
+  const remainingSpots = (league: League) => league.spotsRemaining ?? Math.max(0, league.playerLimit - (league.registeredCount ?? 0));
+  const registrationState = (league: League) => {
+    if (league.registrationStatus === "waitlist") return "waitlist";
+    if (remainingSpots(league) <= 0) return "full";
+    return league.registrationOpen ? "open" : "closed";
+  };
+  const managedLeagues = leagues.filter((league) => {
+    const state = registrationState(league);
+    const season = seasons.find((item) => item.id === league.seasonId);
+    if (leagueStatus === "active" && (state !== "open" || season?.status === "closed")) return false;
+    if (leagueStatus !== "all" && leagueStatus !== "active" && state !== leagueStatus) return false;
+    if (leagueSeason !== "all" && league.seasonId !== leagueSeason) return false;
+    if (leagueType !== "all" && league.format !== leagueType) return false;
+    const query = leagueQuery.trim().toLowerCase();
+    return !query || [league.name, league.venue, season?.name, FORMAT_LABELS[league.format], league.area, league.geographicGroup].some((value) => value?.toLowerCase().includes(query));
+  }).sort((a, b) => {
+    if (leagueSort === "capacity") return remainingSpots(a) - remainingSpots(b);
+    if (leagueSort === "date") {
+      const date = (league: League) => {
+        const raw = league.startDate || seasons.find((item) => item.id === league.seasonId)?.startDate;
+        const time = raw ? Date.parse(raw) : NaN;
+        return Number.isFinite(time) ? time : Number.MAX_SAFE_INTEGER;
+      };
+      return date(a) - date(b);
+    }
+    const order = { open: 0, full: 1, waitlist: 2, closed: 3 };
+    return order[registrationState(a)] - order[registrationState(b)] || a.name.localeCompare(b.name);
+  });
+
+  const leagueFilters = <div className="grid gap-4 sm:grid-cols-3">
+              <label className="space-y-1 text-xs font-semibold">Registration status
+                <select aria-label="Filter league status" value={leagueStatus} onChange={(event) => setLeagueStatus(event.target.value)} className="block h-11 w-full rounded-lg border border-input bg-background px-2 text-sm">
+                  <option value="active">Active / open</option><option value="all">All statuses</option><option value="open">Open</option><option value="closed">Closed</option><option value="full">Full</option><option value="waitlist">Waitlist</option>
+                </select>
+              </label>
+              <label className="space-y-1 text-xs font-semibold">Season
+                <select aria-label="Filter league season" value={leagueSeason} onChange={(event) => setLeagueSeason(event.target.value)} className="block h-11 w-full rounded-lg border border-input bg-background px-2 text-sm">
+                  <option value="all">All seasons</option>{seasons.map((season) => <option key={season.id} value={season.id}>{season.name}</option>)}
+                </select>
+              </label>
+              <label className="space-y-1 text-xs font-semibold">League type
+                <select aria-label="Filter league type" value={leagueType} onChange={(event) => setLeagueType(event.target.value)} className="block h-11 w-full rounded-lg border border-input bg-background px-2 text-sm">
+                  <option value="all">All types</option>{Object.entries(FORMAT_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </label>
+  </div>;
+
   if (!hydrated || !user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -263,139 +318,56 @@ function OrganizerHub() {
         <p className="mt-2 text-muted-foreground">
           Manage seasons, leagues, and player registrations.
         </p>
-        <DemoBanner
-          message="All league data, player registrations and statistics shown here are simulated for this prototype."
-          className="mt-4"
-        />
       </div>
 
-      <div className="relative mb-8 border-b border-border">
-        <div
-          role="tablist"
-          aria-label="Organizer navigation tabs"
-          className="-mx-4 flex items-center gap-1 sm:gap-6 overflow-x-auto px-4 sm:mx-0 sm:px-0 no-scrollbar scroll-smooth"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "leagues"}
-            className={cn(
-              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
-              activeTab === "leagues"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            onClick={(e) => {
-              setActiveTab("leagues");
-              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }}
-          >
-            <Users className="size-4 shrink-0" />
-            <span>Manage Leagues</span>
+      <div role="tablist" aria-label="Organizer navigation tabs" className="mb-6 grid grid-cols-3 gap-1 rounded-xl bg-muted p-1 sm:mb-8 sm:flex sm:gap-2">
+        {[
+          { id: "leagues", label: "Manage Leagues", icon: Users },
+          { id: "geography", label: "Atlanta Geography", icon: MapPin },
+          { id: "create", label: "Create League", icon: Plus },
+        ].map((tab, index, tabs) => (
+          <button key={tab.id} id={`organizer-tab-${tab.id}`} type="button" role="tab"
+            aria-selected={activeTab === tab.id} aria-controls={`organizer-panel-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
+            className={cn("flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs font-semibold leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:min-h-11 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm",
+              activeTab === tab.id ? "bg-card text-primary shadow-sm" : "text-foreground hover:bg-card/60")}
+            onClick={() => setActiveTab(tab.id as "leagues" | "geography" | "create")}
+            onKeyDown={(event) => {
+              let next = index;
+              if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+              else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+              else if (event.key === "Home") next = 0;
+              else if (event.key === "End") next = tabs.length - 1;
+              else return;
+              event.preventDefault();
+              const nextTab = tabs[next];
+              if (!nextTab) return;
+              setActiveTab(nextTab.id as "leagues" | "geography" | "create");
+              document.getElementById(`organizer-tab-${nextTab.id}`)?.focus();
+            }}>
+            <tab.icon className="size-4 shrink-0" aria-hidden="true" />
+            <span>{tab.label}</span>
           </button>
-
-          {/* Future Concept - Not Included in V1: Score Verification (hidden for V1)
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "scores"}
-            className={cn(
-              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
-              activeTab === "scores"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            onClick={(e) => {
-              setActiveTab("scores");
-              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }}
-          >
-            <ShieldCheck className="size-4 shrink-0" />
-            <span>Future Concept - Not Included in V1</span>
-            <span className="rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold">
-              Future Concept
-            </span>
-          </button>
-          */}
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "geography"}
-            className={cn(
-              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
-              activeTab === "geography"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            onClick={(e) => {
-              setActiveTab("geography");
-              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }}
-          >
-            <MapPin className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            <span>Atlanta Geography</span>
-          </button>
-
-          {/* Future Concept - Not Included in V1: Playoff Bracket (hidden for V1)
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "bracket"}
-            className={cn(
-              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
-              activeTab === "bracket"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            onClick={(e) => {
-              setActiveTab("bracket");
-              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }}
-          >
-            <Trophy className="size-4 shrink-0 text-amber-500" />
-            <span>Future Concept - Not Included in V1</span>
-          </button>
-          */}
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === "create"}
-            className={cn(
-              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
-              activeTab === "create"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            onClick={(e) => {
-              setActiveTab("create");
-              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }}
-          >
-            <Plus className="size-4 shrink-0" />
-            <span>Create League</span>
-          </button>
-        </div>
+        ))}
       </div>
 
       {activeTab === "leagues" && (
-        <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="text-sm font-medium text-muted-foreground">Total Active Leagues</div>
-              <div className="mt-2 text-3xl font-bold">{leagues.length}</div>
+        <div id="organizer-panel-leagues" role="tabpanel" aria-labelledby="organizer-tab-leagues" className="space-y-6">
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
+            <div className="rounded-xl border border-border bg-card px-3 py-4 shadow-sm md:p-6">
+              <div className="text-[11px] leading-snug md:text-sm font-medium text-muted-foreground"><span className="md:hidden">Leagues</span><span className="hidden md:inline">Total Leagues</span></div>
+              <div className="mt-1 text-2xl md:mt-2 md:text-3xl font-bold">{leagues.length}</div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="text-sm font-medium text-muted-foreground">Total League Registrations</div>
-              <div className="mt-2 text-3xl font-bold text-primary">
+            <div className="rounded-xl border border-border bg-card px-3 py-4 shadow-sm md:p-6">
+              <div className="text-[11px] leading-snug md:text-sm font-medium text-muted-foreground"><span className="md:hidden">Entries</span><span className="hidden md:inline">Total League Registrations</span></div>
+              <div className="mt-1 text-2xl md:mt-2 md:text-3xl font-bold text-primary">
                 {loadingRegistrations && allRegistrations.length === 0 ? (
                   <Skeleton className="h-9 w-20" />
                 ) : (
                   effectiveRegistrations.filter((r) => r.paymentStatus === "paid" || r.paymentStatus === "held").length
                 )}
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
+              <div className="mt-1 hidden text-xs text-muted-foreground md:block">
                 {effectiveRegistrations.filter((r) => r.paymentStatus === "held").length > 0 && (
                   <span className="text-amber-600 dark:text-amber-400 font-semibold">
                     ({effectiveRegistrations.filter((r) => r.paymentStatus === "held").length} currently on 15m hold)
@@ -403,29 +375,70 @@ function OrganizerHub() {
                 )}
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="text-sm font-medium text-muted-foreground">Total Players</div>
-              <div className="mt-2 text-3xl font-bold">
+            <div className="rounded-xl border border-border bg-card px-3 py-4 shadow-sm md:p-6">
+              <div className="text-[11px] leading-snug md:text-sm font-medium text-muted-foreground"><span className="md:hidden">Players</span><span className="hidden md:inline">Total Players</span></div>
+              <div className="mt-1 text-2xl md:mt-2 md:text-3xl font-bold">
                 {totalPlayersCount !== null ? totalPlayersCount : players.length}
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
+              <div className="mt-1 hidden text-xs text-muted-foreground md:block">
                 Distinct registered players
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-8 mb-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-foreground">All Leagues</h2>
+              <h2 className="text-xl font-bold text-foreground">Manage Leagues</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Click on any league to view registered participants, contact details, and real-time payment hold statuses.
+                Open a league to manage its participants and registration.
               </p>
             </div>
           </div>
 
+          <div className="space-y-3">
+            <label className="relative block">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input type="search" aria-label="Search organizer leagues" placeholder="Search leagues, venues or seasons" value={leagueQuery} onChange={(event) => setLeagueQuery(event.target.value)} className="h-11 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-sm" />
+            </label>
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-end gap-3 sm:grid-cols-4">
+              <div className="sm:hidden">
+                <Sheet open={leagueFiltersOpen} onOpenChange={setLeagueFiltersOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="h-11 rounded-lg">
+                      <SlidersHorizontal className="size-4" /> Filters
+                      {(leagueStatus !== "all" || leagueSeason !== "all" || leagueType !== "all") && <span className="flex size-5 items-center justify-center rounded-full bg-secondary text-[11px] text-primary">{Number(leagueStatus !== "all") + Number(leagueSeason !== "all") + Number(leagueType !== "all")}</span>}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-3xl pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+                    <SheetHeader className="mb-5 text-left">
+                      <SheetTitle>Filter leagues</SheetTitle>
+                      <SheetDescription>Choose registration status, season and league type.</SheetDescription>
+                    </SheetHeader>
+                    {leagueFilters}
+                    <div className="mt-6 flex gap-3">
+                      <Button variant="outline" onClick={() => { setLeagueStatus("all"); setLeagueSeason("all"); setLeagueType("all"); }}>Reset</Button>
+                      <Button className="flex-1" onClick={() => setLeagueFiltersOpen(false)}>Show {managedLeagues.length} {managedLeagues.length === 1 ? "league" : "leagues"}</Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+              <div className="hidden sm:col-span-3 sm:block">{leagueFilters}</div>
+              <label className="space-y-1 text-xs font-semibold">Sort by
+                <select aria-label="Sort organizer leagues" value={leagueSort} onChange={(event) => setLeagueSort(event.target.value)} className="block h-11 w-full rounded-lg border border-input bg-background px-2 text-sm">
+                  <option value="status">Status</option><option value="date">Soonest start</option><option value="capacity">Fewest spots</option>
+                </select>
+              </label>
+            </div>
+            <div className="flex items-center justify-between gap-3 border-b border-border pb-2 text-xs">
+              <p aria-live="polite" className="text-muted-foreground">{managedLeagues.length} of {leagues.length} leagues</p>
+              <button type="button" className="min-h-11 font-semibold text-primary hover:underline" onClick={() => { setLeagueQuery(""); setLeagueStatus("all"); setLeagueSeason("all"); setLeagueType("all"); }}>Show all leagues</button>
+            </div>
+          </div>
+          {managedLeagues.length === 0 && <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No leagues match these filters. Try another status or show all leagues.</p>}
+
           {/* Mobile League Cards (<lg) */}
           <div className="space-y-3.5 lg:hidden">
-            {leagues.map((league) => {
+            {managedLeagues.map((league) => {
               const season = seasons.find((s) => s.id === league.seasonId);
               const leagueRegs = effectiveRegistrations.filter((r) => r.leagueId === league.id);
               const heldCount = leagueRegs.filter((r) => r.paymentStatus === "held").length;
@@ -440,8 +453,9 @@ function OrganizerHub() {
                 <div
                   key={league.id}
                   onClick={() => setSelectedLeague(league)}
-                  className="rounded-2xl border border-border bg-card p-4 shadow-sm active:scale-[0.99] transition-all cursor-pointer space-y-3"
+                  className="relative rounded-2xl border border-border bg-card p-4 shadow-sm active:scale-[0.99] transition-all space-y-3"
                 >
+                  <button type="button" aria-label={`View participants for ${league.name}`} onClick={() => setSelectedLeague(league)} className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <h3 className="font-bold text-base text-foreground leading-tight">{cleanLeagueName(league.name)}</h3>
@@ -454,15 +468,9 @@ function OrganizerHub() {
                         </span>
                       </div>
                     </div>
-                    {league.registrationOpen ? (
-                      <span className="inline-flex items-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 shrink-0">
-                        Open
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 shrink-0">
-                        Closed
-                      </span>
-                    )}
+                    <span className={cn("inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold capitalize", registrationState(league) === "open" ? "bg-emerald-100 text-emerald-800" : "bg-muted text-foreground")}>
+                      {registrationState(league)}
+                    </span>
                   </div>
 
                   <div className="text-xs text-muted-foreground space-y-1 pt-1 border-t border-border/50">
@@ -493,12 +501,12 @@ function OrganizerHub() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+                  <div className="relative z-20 grid grid-cols-1 gap-2 pt-1 sm:grid-cols-2" onClick={(e) => e.stopPropagation()}>
                     <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => setSelectedLeague(league)}
-                      className="flex-1 rounded-full text-xs font-semibold h-9"
+                      className="h-11 min-h-11 w-full rounded-full text-xs font-semibold"
                     >
                       <Users className="size-3.5 mr-1.5 text-primary" /> View Participants ({Math.min(league.playerLimit, confirmedCount + heldCount)})
                     </Button>
@@ -506,9 +514,10 @@ function OrganizerHub() {
                       variant="outline"
                       size="sm"
                       onClick={() => toggleRegistration(league.id)}
-                      className="rounded-full text-xs h-9 px-3"
+                      className="h-11 min-h-11 w-full rounded-full px-3 text-xs font-semibold"
                     >
                       {league.registrationOpen ? <Lock className="size-3.5" /> : <Unlock className="size-3.5" />}
+                      {league.registrationOpen ? "Close registration" : "Open registration"}
                     </Button>
                   </div>
                 </div>
@@ -530,7 +539,7 @@ function OrganizerHub() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {leagues.map((league) => {
+                  {managedLeagues.map((league) => {
                     const season = seasons.find((s) => s.id === league.seasonId);
                     const leagueRegs = effectiveRegistrations.filter((r) => r.leagueId === league.id);
                     const heldCount = leagueRegs.filter((r) => r.paymentStatus === "held").length;
@@ -647,7 +656,7 @@ function OrganizerHub() {
               </div>
               <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-300/90">
                 Official fixture generation, player match reporting, and score verification are planned for post-V1 release.
-                V1 focuses on real-time registration holds, capacity management, and roster organization.
+                V1 provides current registration availability and roster organization. Payments currently use a mock flow.
               </p>
             </div>
           </div>
@@ -915,7 +924,7 @@ function OrganizerHub() {
       )}
 
       {activeTab === "create" && (
-        <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-sm">
+        <div id="organizer-panel-create" role="tabpanel" aria-labelledby="organizer-tab-create" className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-sm">
           <h2 className="text-xl font-bold mb-6">Create New League</h2>
           <form onSubmit={handleCreateLeague} className="space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
@@ -1023,7 +1032,7 @@ function OrganizerHub() {
       )}
 
       {activeTab === "geography" && (
-        <div className="space-y-6">
+        <div id="organizer-panel-geography" role="tabpanel" aria-labelledby="organizer-tab-geography" className="space-y-6">
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
             <h2 className="text-xl font-bold mb-2">Metro Atlanta Geographic Distribution</h2>
             <p className="text-sm text-muted-foreground mb-6">
@@ -1066,7 +1075,7 @@ function OrganizerHub() {
 
       {/* ─── League Participants Dialog Modal ─────────────────────────────── */}
       <Dialog open={Boolean(selectedLeague)} onOpenChange={(open) => { if (!open) { setSelectedLeague(null); setSearchQuery(""); setStatusFilter("all"); } }}>
-        <DialogContent className="w-[calc(100vw-1.25rem)] sm:w-full sm:max-w-4xl max-h-[92vh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl border-border">
+        <DialogContent className="w-[calc(100vw-1rem)] sm:w-full sm:max-w-4xl max-h-[92dvh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl border-border [&>button]:flex [&>button]:size-11 [&>button]:items-center [&>button]:justify-center [&>button]:right-2 [&>button]:top-2 sm:[&>button]:size-8">
           {selectedLeague && (() => {
             const season = seasons.find((s) => s.id === selectedLeague.seasonId);
             const leagueParticipants = effectiveRegistrations.filter((r) => r.leagueId === selectedLeague.id || ((selectedLeague as any).slug && r.leagueId === (selectedLeague as any).slug));
@@ -1113,12 +1122,12 @@ function OrganizerHub() {
             };
 
             return (
-              <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[92vh]">
+              <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-[92dvh]">
                 {/* Modal Header */}
-                <div className="border-b border-border/80 bg-muted/40 p-4 sm:p-7 pr-10 sm:pr-7">
+                <div className="border-b border-border/80 bg-muted/40 p-4 sm:p-7">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap pr-10 sm:pr-0">
                         <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
                           {FORMAT_LABELS[selectedLeague.format] || selectedLeague.format}
                         </span>
@@ -1129,7 +1138,7 @@ function OrganizerHub() {
                           {formatMoney(selectedLeague.feeCents)} per player
                         </span>
                       </div>
-                      <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground break-words leading-tight">
+                      <DialogTitle className="pr-8 sm:pr-0 text-xl sm:text-2xl font-bold text-foreground break-words leading-tight">
                         {cleanLeagueName(selectedLeague.name)}
                       </DialogTitle>
                       <DialogDescription className="mt-1.5 text-xs text-muted-foreground flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 flex-wrap">
@@ -1155,7 +1164,7 @@ function OrganizerHub() {
                         variant="outline"
                         size="sm"
                         onClick={copyAllEmails}
-                        className="rounded-full text-xs font-semibold h-8 sm:h-9 w-full sm:w-auto"
+                        className="rounded-xl text-sm font-semibold h-11 sm:h-9 w-full sm:w-auto"
                       >
                         {copiedEmails ? (
                           <>
@@ -1171,14 +1180,14 @@ function OrganizerHub() {
                   </div>
 
                   {/* KPI Badges */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-4 sm:mt-6">
                     <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5 sm:p-3 text-left">
                       <div className="text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider truncate">
-                        Paid (Confirmed)
+                        <span className="sm:hidden">Confirmed</span><span className="hidden sm:inline">Paid (Confirmed)</span>
                       </div>
                       <div className="text-xl sm:text-2xl font-bold text-emerald-800 dark:text-emerald-300 mt-0.5 flex items-baseline">
                         {confirmedCount}
-                        <span className="text-[11px] sm:text-xs font-normal text-muted-foreground ml-1">
+                        <span className="hidden sm:inline text-xs font-normal text-muted-foreground ml-1">
                           / {selectedLeague.playerLimit}
                         </span>
                       </div>
@@ -1187,7 +1196,7 @@ function OrganizerHub() {
                     <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-2.5 sm:p-3 text-left">
                       <div className="text-[10px] sm:text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1 truncate">
                         <Clock className="size-3 shrink-0" />
-                        <span className="truncate">15m Holds</span>
+                        <span className="truncate">Holds</span>
                       </div>
                       <div className="text-xl sm:text-2xl font-bold text-amber-800 dark:text-amber-300 mt-0.5 flex items-baseline gap-1">
                         {heldParticipants.length}
@@ -1197,13 +1206,13 @@ function OrganizerHub() {
                       </div>
                     </div>
 
-                    <div className="col-span-2 sm:col-span-1 rounded-xl border border-border bg-background p-2.5 sm:p-3 text-left">
+                    <div className="rounded-xl border border-border bg-background p-2.5 sm:p-3 text-left">
                       <div className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-wider truncate">
-                        Spots Remaining
+                        <span className="sm:hidden">Available</span><span className="hidden sm:inline">Spots Remaining</span>
                       </div>
                       <div className="text-xl sm:text-2xl font-bold text-foreground mt-0.5 flex items-baseline">
                         {spotsRemaining}
-                        <span className="text-[11px] sm:text-xs font-normal text-muted-foreground ml-1.5">
+                        <span className="hidden sm:inline text-xs font-normal text-muted-foreground ml-1.5">
                           open of {selectedLeague.playerLimit}
                         </span>
                       </div>
@@ -1212,45 +1221,49 @@ function OrganizerHub() {
                 </div>
 
                 {/* Filter and Search Bar */}
-                <div className="p-3 sm:p-5 border-b border-border bg-card/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
+                <div className="sticky top-0 z-10 p-3 sm:p-5 border-b border-border bg-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
                   <div className="relative w-full sm:w-72">
                     <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
-                      type="text"
+                      type="search"
+                      aria-label="Search participants"
                       placeholder="Search name, email, phone..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full rounded-full border border-border bg-background pl-9 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      className="w-full rounded-full border border-border bg-background h-11 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     />
                   </div>
 
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 sm:pb-0 w-full sm:w-auto shrink-0">
+                  <div className="grid grid-cols-3 gap-1 rounded-xl bg-muted p-1 w-full sm:w-auto shrink-0">
                     <button
                       type="button"
+                      aria-pressed={statusFilter === "all"}
                       onClick={() => setStatusFilter("all")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === "all"
+                      className={`min-h-11 px-2 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${statusFilter === "all"
                         ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-muted text-muted-foreground hover:text-foreground"
+                        : "text-foreground hover:bg-background"
                         }`}
                     >
                       All ({leagueParticipants.length})
                     </button>
                     <button
                       type="button"
+                      aria-pressed={statusFilter === "paid"}
                       onClick={() => setStatusFilter("paid")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === "paid"
+                      className={`min-h-11 px-2 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${statusFilter === "paid"
                         ? "bg-emerald-600 text-white shadow-sm"
-                        : "bg-muted text-muted-foreground hover:text-foreground"
+                        : "text-foreground hover:bg-background"
                         }`}
                     >
                       Paid ({paidParticipants.length})
                     </button>
                     <button
                       type="button"
+                      aria-pressed={statusFilter === "held"}
                       onClick={() => setStatusFilter("held")}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${statusFilter === "held"
+                      className={`min-h-11 px-2 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${statusFilter === "held"
                         ? "bg-amber-600 text-white shadow-sm"
-                        : "bg-muted text-muted-foreground hover:text-foreground"
+                        : "text-foreground hover:bg-background"
                         }`}
                     >
                       On Hold ({heldParticipants.length})
@@ -1273,7 +1286,7 @@ function OrganizerHub() {
                   ) : (
                     <>
                       {/* Mobile Participant Cards (<md) */}
-                      <div className="space-y-3 md:hidden">
+                      <div className="divide-y divide-border md:hidden">
                         {filteredParticipants.map((p, idx) => {
                           const isPaid = p.paymentStatus === "paid";
                           const isHeld = p.paymentStatus === "held";
@@ -1287,7 +1300,7 @@ function OrganizerHub() {
                           return (
                             <div
                               key={p.id || idx}
-                              className="rounded-xl border border-border bg-card p-3.5 shadow-sm space-y-2.5"
+                              className="py-4 first:pt-0 space-y-2"
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex items-center gap-2.5 min-w-0">
@@ -1326,11 +1339,16 @@ function OrganizerHub() {
                                 </div>
                               </div>
 
+                              <details className="group/contact">
+                                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold text-primary [&::-webkit-details-marker]:hidden">
+                                  Contact & registration details
+                                  <span className="text-lg transition-transform group-open/contact:rotate-45" aria-hidden="true">+</span>
+                                </summary>
                               {/* Contact Information */}
                               <div className="text-xs space-y-1 pt-2 border-t border-border/60">
                                 <a
                                   href={`mailto:${p.email}`}
-                                  className="flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors truncate"
+                                  className="flex min-h-11 items-center gap-2 font-medium text-foreground hover:text-primary transition-colors truncate"
                                   title={p.email}
                                 >
                                   <Mail className="size-3.5 text-muted-foreground shrink-0" />
@@ -1339,7 +1357,7 @@ function OrganizerHub() {
                                 {p.phone && p.phone !== "Not provided" && (
                                   <a
                                     href={`tel:${p.phone}`}
-                                    className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors text-[11px]"
+                                    className="flex min-h-11 items-center gap-2 text-foreground hover:text-primary transition-colors text-sm"
                                   >
                                     <Phone className="size-3 shrink-0" />
                                     <span>{p.phone}</span>
@@ -1353,6 +1371,7 @@ function OrganizerHub() {
                                 )}
                               </div>
 
+                              </details>
                               {/* Footer note: timestamp & hold timer */}
                               <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1.5 border-t border-border/40">
                                 <span>

@@ -99,11 +99,8 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("Atlanta");
-  const [zipCode, setZipCode] = useState("30309");
-  const [preferredCourt, setPreferredCourt] = useState("Piedmont Park Courts");
-  const [ntrp, setNtrp] = useState<SkillLevel>("3.5");
+  const [zipCode, setZipCode] = useState("");
+  const [ntrp, setNtrp] = useState<SkillLevel | "">("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -192,6 +189,11 @@ function Signup() {
         setError("Parent or guardian phone number is required for junior players under 18.");
         return;
       }
+      const guardianDigits = parentPhone.replace(/\D/g, "");
+      if (!/^[+\d\s().-]+$/.test(parentPhone) || guardianDigits.length < 10 || guardianDigits.length > 15) {
+        setError("Please enter a valid parent or guardian phone number, including the area code.");
+        return;
+      }
     }
 
     if (password.length < 8) {
@@ -204,8 +206,13 @@ function Signup() {
       return;
     }
 
-    if (zipCode && !APPROVED_ATLANTA_ZIPS.includes(zipCode.trim() as any)) {
+    if (!APPROVED_ATLANTA_ZIPS.includes(zipCode.trim() as any)) {
       setError("Please select a valid 5-digit approved Atlanta metro ZIP code.");
+      return;
+    }
+
+    if (!ntrp) {
+      setError("Please select your skill level.");
       return;
     }
 
@@ -217,10 +224,10 @@ function Signup() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: firstName.trim(), lastName: lastName.trim(), email: normalizedEmail,
-          password, phone: phone.trim() || undefined, city: city.trim() || "Atlanta", ntrp,
-          dateOfBirth, parentName: isUnder18 ? parentName.trim() : undefined,
-          parentPhone: isUnder18 ? parentPhone.trim() : undefined, isJunior: isUnder18,
-          zipCode: zipCode.trim(), preferredCourt: preferredCourt.trim(),
+          password, ntrp,
+          dateOfBirth: dateOfBirth || undefined, parentName: isUnder18 ? parentName.trim() : undefined,
+          parentPhone: isUnder18 ? parentPhone.trim() : undefined, isJunior: dateOfBirth ? isUnder18 : undefined,
+          zipCode: zipCode.trim(),
         }),
       });
       const json = await res.json();
@@ -367,7 +374,7 @@ function Signup() {
               </div>
 
               <div>
-                <div className="mb-1 flex items-center justify-between">
+                <div className="mb-1 flex flex-wrap items-center justify-between gap-1">
                   <label htmlFor="dob-trigger" className="block text-sm font-medium text-foreground">
                     Date of Birth <span className="text-xs text-muted-foreground font-normal ml-1">(Optional)</span>
                   </label>
@@ -389,17 +396,19 @@ function Signup() {
                   age={age}
                   isUnder18={isUnder18}
                 />
+                <p className="mt-1.5 text-xs text-muted-foreground">Used to identify age eligibility and guardian requirements.</p>
               </div>
             </div>
 
             {/* Junior Player Parent / Guardian Information */}
             {isUnder18 && (
-              <div className="rounded-xl border border-amber-300/80 bg-amber-50/70 p-4 dark:border-amber-800/80 dark:bg-amber-950/30 space-y-3">
-                <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
-                  <ShieldAlert className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                  <p className="text-xs font-semibold">
-                    Junior Player Notice: Since you are under 18, parent or guardian contact details are required.
-                  </p>
+              <div className="rounded-xl border border-border bg-secondary/30 p-4 sm:p-5 space-y-4">
+                <div className="flex items-start gap-2.5 text-foreground">
+                  <ShieldAlert className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <div>
+                    <h3 className="text-sm font-semibold">Parent or guardian details</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Required for players under 18. Please provide their full name and contact number.</p>
+                  </div>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
@@ -412,8 +421,9 @@ function Signup() {
                       required={isUnder18}
                       value={parentName}
                       onChange={(e) => setParentName(e.target.value)}
-                      placeholder="Parent's full name"
-                      className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      placeholder="Enter their full name"
+                      autoComplete="section-guardian name"
+                      className="block w-full rounded-lg border border-input bg-background h-11 px-3.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div>
@@ -426,70 +436,25 @@ function Signup() {
                       required={isUnder18}
                       value={parentPhone}
                       onChange={(e) => setParentPhone(e.target.value)}
-                      placeholder="(404) 555-0199"
-                      className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      placeholder="Enter phone number"
+                      autoComplete="section-guardian tel"
+                      aria-describedby="guardian-phone-help"
+                      className="block w-full rounded-lg border border-input bg-background h-11 px-3.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
+                    <p id="guardian-phone-help" className="mt-1.5 text-xs text-muted-foreground">Include the area code; add a country code if outside the US.</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Phone + City + ZIP */}
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div>
-                <label htmlFor="phone" className="mb-1 block text-sm font-medium text-foreground">
-                  Phone Number
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="(404) 555-0100"
-                  className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <div>
-                <label htmlFor="city" className="mb-1 block text-sm font-medium text-foreground">
-                  City (Metro ATL)
-                </label>
-                <input
-                  id="city"
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Atlanta"
-                  className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <div>
-                <label htmlFor="zipCode" className="mb-1 block text-sm font-medium text-foreground">
-                  ZIP Code
-                </label>
-                <ZipCodeInput
-                  id="zipCode"
-                  value={zipCode}
-                  onChange={setZipCode}
-                  placeholder="30309"
-                />
-              </div>
-            </div>
-
-            {/* Preferred Home Court */}
+            {/* Required ZIP without preset player information */}
             <div>
-              <label htmlFor="preferredCourt" className="mb-1 block text-sm font-medium text-foreground">
-                Preferred / Home Court
+              <label htmlFor="zipCode" className="mb-1 block text-sm font-medium text-foreground">
+                <span className="text-red-500 font-bold text-xs mr-1 select-none" aria-hidden="true">*</span>ZIP Code
               </label>
-              <input
-                id="preferredCourt"
-                type="text"
-                value={preferredCourt}
-                onChange={(e) => setPreferredCourt(e.target.value)}
-                placeholder="e.g. Piedmont Park Courts"
-                className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
+              <ZipCodeInput id="zipCode" value={zipCode} onChange={setZipCode} required placeholder="Enter your ZIP code" />
+              <p className="mt-1.5 text-xs text-muted-foreground">Choose an approved Metro Atlanta ZIP code.</p>
             </div>
-
 
             {/* Password & Confirm Password */}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -558,6 +523,7 @@ function Signup() {
                   <button
                     key={level}
                     type="button"
+                    aria-pressed={ntrp === level}
                     onClick={() => setNtrp(level as SkillLevel)}
                     className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${ntrp === level
                         ? "bg-primary text-primary-foreground shadow-sm"

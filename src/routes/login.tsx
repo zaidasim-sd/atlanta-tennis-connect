@@ -211,7 +211,7 @@ function Login() {
           <div className="mb-5 flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4 text-sm font-medium text-foreground shadow-sm">
             <AlertCircle className="size-5 shrink-0 text-primary" />
             <p>
-              Please sign in with your account to view league details and continue.
+              Please sign in or create an account to continue with your league registration.
             </p>
           </div>
         )}

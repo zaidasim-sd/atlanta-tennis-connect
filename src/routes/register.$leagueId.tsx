@@ -198,7 +198,7 @@ function RegisterLeague() {
 
   useEffect(() => {
     if (hydrated && !user) {
-      navigate({ to: "/login", search: { leagueId } });
+      navigate({ to: "/login", search: { leagueId, redirect: `/register/${leagueId}` }, replace: true });
     } else if (hydrated && user?.role === "organizer") {
       navigate({ to: "/organizer", replace: true });
     }
@@ -276,7 +276,7 @@ function RegisterLeague() {
     );
   }
 
-  if (!hydrated || (!league && leagues.length === 0)) {
+  if (!hydrated || !user || (!league && leagues.length === 0)) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <BallLoader label="Loading registration..." />
@@ -526,7 +526,7 @@ function RegisterLeague() {
               You're Registered! 🎾
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Payment confirmed · Spot secured in <strong className="text-foreground">{league.name}</strong>
+              Registration recorded for <strong className="text-foreground">{league.name}</strong>
             </p>
 
             <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1 text-xs font-semibold text-muted-foreground shadow-sm">
@@ -631,7 +631,7 @@ function RegisterLeague() {
         </Button>
         <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
           <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Registration Open · Atomic Spot Reservation</span>
+          <span>Registration Open · Current availability shown</span>
         </div>
       </div>
 
@@ -1028,10 +1028,10 @@ function RegisterLeague() {
               <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
                 <div className="flex items-center gap-2 text-primary">
                   <CreditCard className="size-5" />
-                  <h3 className="font-bold text-lg">Secure Stripe Checkout</h3>
+                  <h3 className="font-bold text-lg">Payment / Test Checkout</h3>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                  <Lock className="size-3" /> Stripe Elements
+                  <Lock className="size-3" /> Checkout
                 </span>
               </div>
 
@@ -1071,7 +1071,7 @@ function RegisterLeague() {
               )}
 
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Click below to reserve your atomic spot in <strong className="text-foreground">{league.name}</strong> and proceed to secure checkout.
+                Click below to continue your registration for <strong className="text-foreground">{league.name}</strong> and proceed to the current mock payment flow.
               </p>
 
               {/* Price & Summary Box */}
@@ -1082,7 +1082,7 @@ function RegisterLeague() {
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">Payment Processor</span>
-                  <span className="font-medium">Stripe Checkout / Safe Test Payment</span>
+                  <span className="font-medium">Mock payment flow</span>
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">League Entry Fee</span>
@@ -1130,15 +1130,15 @@ function RegisterLeague() {
               <div className="mt-5 space-y-2 border-t border-border/60 pt-4 text-[11px] text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="size-3.5 text-primary shrink-0" />
-                  <span>Zero oversell guarantee with atomic spot reservation</span>
+                  <span>Current availability is shown for each league</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Lock className="size-3.5 text-primary shrink-0" />
-                  <span>256-bit SSL encrypted Stripe payment processing</span>
+                  <span>Payment processing will be enabled through the selected provider</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="size-3.5 text-primary shrink-0" />
-                  <span>Instant confirmation & official registration entry</span>
+                  <span>Registration is confirmed once the process is completed</span>
                 </div>
               </div>
             </div>
