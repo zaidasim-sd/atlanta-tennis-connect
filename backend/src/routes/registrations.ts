@@ -27,61 +27,11 @@ import { requireAuth, requireOrganizer, ownsEmail } from "../lib/auth";
 
 const router = Router();
 
-// POST /api/registrations/confirm (Called upon checkout / payment success)
-router.post(
-  "/confirm",
-  wrap(async (req, res) => {
-    const { leagueId, playerEmail, playerName, ntrp, phone, preferredCourt, amountCents } = req.body;
-    if (!leagueId || !playerEmail) return err(res, "leagueId and playerEmail are required", 400);
-
-    const email = String(playerEmail).trim().toLowerCase();
-    let player = await Player.findOne({ email });
-    if (!player) {
-      const parts = String(playerName || "Player").split(" ");
-      player = await Player.create({
-        slug: `p-${Math.random().toString(36).slice(2, 9)}`,
-        firstName: parts[0] || "Player",
-        lastName: parts.slice(1).join(" ") || "",
-        email,
-        phone: phone || "(404) 555-0100",
-        ntrp: ntrp || "3.5",
-        city: "Atlanta",
-        zipCode: "30309",
-        preferredCourt: preferredCourt || "Piedmont Park Courts",
-        accountStatus: "active",
-        profileStatus: "complete",
-      });
-    }
-
-    const reservation = await Reservation.findOneAndUpdate(
-      { leagueSlug: leagueId, playerEmail: email },
-      {
-        $set: {
-          leagueSlug: leagueId,
-          playerSlug: player.slug,
-          playerEmail: email,
-          status: "registered",
-          amountCents: amountCents || 3500,
-          paidAt: new Date(),
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        },
-        $setOnInsert: {
-          idempotencyKey: `client-conf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        },
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-    );
-
-    return ok(res, {
-      id: reservation._id.toString(),
-      leagueId: reservation.leagueSlug,
-      playerId: reservation.playerSlug,
-      status: "registered",
-      paymentStatus: "paid",
-    }, 201);
-  }),
+// Browser requests cannot create a paid registration.
+// Confirmation occurs only through verified payment reconciliation.
+router.post("/confirm", (_req, res) =>
+  err(res, "Use verified payment reconciliation to confirm a registration", 410),
 );
-
 router.use(requireAuth);
 
 const CreateBody = z.object({

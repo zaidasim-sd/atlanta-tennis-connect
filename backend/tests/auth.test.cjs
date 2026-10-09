@@ -171,3 +171,18 @@ test("private responses are not cacheable and login rate limiting persists in Mo
   for (let i = 0; i < 10; i++) assert.equal((await request("/api/auth/login", { method: "POST", body: { email: "a@example.test", password: "wrong" } })).status, 401);
   assert.equal((await request("/api/auth/login", { method: "POST", body: { email: "a@example.test", password } })).status, 429);
 });
+
+test("legacy browser confirmation cannot create or change a registration", async () => {
+  const id = await reserve();
+  const before = await Reservation.countDocuments({});
+  for (const who of [undefined, "a", "org"]) {
+    const result = await request("/api/registrations/confirm", {
+      method: "POST", who,
+      body: { leagueId: "l-sec", playerEmail: "a@example.test", amountCents: 100 },
+    });
+    assert.equal(result.status, 410);
+  }
+  assert.equal(await Reservation.countDocuments({}), before);
+  assert.equal((await Reservation.findById(id)).status, "payment_pending");
+  assert.equal((await League.findOne({ slug: "l-sec" })).spotsRemaining, 2);
+});

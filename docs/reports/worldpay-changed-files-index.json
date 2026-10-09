@@ -1,0 +1,276 @@
+{
+  "savedUtc": "2026-10-09T05:18:13.138156+00:00",
+  "files": [
+    {
+      "file": "backend/scripts/worldpay-evidence-run.cjs",
+      "bytes": 8285,
+      "sha256": "06c42f024671a80f6cacec350899bc40aedaa4112ec19c37e4cfca88098b6942"
+    },
+    {
+      "file": "backend/scripts/worldpay-http-concurrency-evidence.cjs",
+      "bytes": 4022,
+      "sha256": "a442e2941c2cfa064919e119fe046c7adc56be73989426fb839773b13c93394b"
+    },
+    {
+      "file": "backend/src/routes/registrations.ts",
+      "bytes": 5885,
+      "sha256": "494631effa54bbe241748da9794d580b17d9492a89547cc91f4d1a58faca2478"
+    },
+    {
+      "file": "backend/tests/auth.test.cjs",
+      "bytes": 13518,
+      "sha256": "b6d3bea4372d9162a8144887be694364c3c532058470d6bac9b843748713eddb"
+    },
+    {
+      "file": "deliverables/payment-validation/Sandbox verification.jsonl",
+      "bytes": 1880,
+      "sha256": "ddad6a13b16f69395747d7e082088cfcdcd0d96f67f266ce351f9a6441d600ff"
+    },
+    {
+      "file": "deliverables/payment-validation/Worldpay and E2Pay validation updated.docx",
+      "bytes": 1579781,
+      "sha256": "cc89f5be4e059aa60caa604b1c99cf69f53eed65302ba49b562c3ee1e4130536"
+    },
+    {
+      "file": "deliverables/payment-validation/Worldpay tests.txt",
+      "bytes": 1062,
+      "sha256": "9c353f7a8a48d662810b47e60a271bc5353ee883b1208cb348a757fd3da16472"
+    },
+    {
+      "file": "docs/evidence/2026-10-08-baseline-backend.txt",
+      "bytes": 12253,
+      "sha256": "f02e0f4a6044020fe6047ed6f66d9aa674e777eeed94e67c2b17de4636faa4f2"
+    },
+    {
+      "file": "docs/evidence/2026-10-08-baseline-typescript.txt",
+      "bytes": 70,
+      "sha256": "aadb56238235668949620d34b29aa574765530de92dafa8eb4a38c1b871a06b5"
+    },
+    {
+      "file": "docs/evidence/2026-10-08T123758407Z-snapshot.json",
+      "bytes": 2615,
+      "sha256": "4394c53190467ebae1d36a3dec7028ad105789fb443df7bcad9fee34a0b6789b"
+    },
+    {
+      "file": "docs/evidence/2026-10-08T124109681Z-reverse.json",
+      "bytes": 14649,
+      "sha256": "67609cea923574ada5b9e9375fbe22dca8bec00f8bbe38a279591884008fdad5"
+    },
+    {
+      "file": "docs/evidence/2026-10-08T124134089Z-concurrent.json",
+      "bytes": 5253,
+      "sha256": "bc883f57cfeaaaae84593ff4ee6c1f454515d4fe91e89faf096978322c439f02"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-cleanup.json",
+      "bytes": 783,
+      "sha256": "a4900691ce918d7685508dac52d9126b446e3a4b8798abbc08bf66f8c0d5c7eb"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-confirmation-route-check.json",
+      "bytes": 216,
+      "sha256": "ff25c14e5ca68a4d689c323092eac7dba2655370359905a6572aab6b0614b2cb"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-final-backend-unit.txt",
+      "bytes": 986,
+      "sha256": "24b88c8362c3ffbab623c02e8549008b166977cb6c26fd2f40b684b62145b05f"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-final-backend.txt",
+      "bytes": 12781,
+      "sha256": "64e4a91e3e25af1cd0ec5b5e05d2340740380f325a1f4a0a85d4027d95d03f6c"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-final-typescript.txt",
+      "bytes": 70,
+      "sha256": "aadb56238235668949620d34b29aa574765530de92dafa8eb4a38c1b871a06b5"
+    },
+    {
+      "file": "docs/evidence/2026-10-09-original-state-check.json",
+      "bytes": 632,
+      "sha256": "05de93b6ceeb14ef7fdf2eca1c0c2f687c4a7cbdc47af560b968609d5af66626"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T042800611Z-job.json",
+      "bytes": 8578,
+      "sha256": "6729c57f89ae73e6e55dc5df46b6a19cf6d048fb04f2374c0bffb2e7f2f14461"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T043718677Z-snapshot.json",
+      "bytes": 13405,
+      "sha256": "8a0331cffe2a1a29fb5c2261894cb0e6de984d40f884433a399a5e8f5b041b53"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T043822571Z-replay.json",
+      "bytes": 21826,
+      "sha256": "57512912469e62f9312e92a462c51172d66f619fa1a1d3929d3fb218285550ba"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T044300429Z-snapshot.json",
+      "bytes": 20673,
+      "sha256": "3af1381550f39d2f1c0b776fd8c2e4a93a711bac064741ddb82a29495779b588"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T044424800Z-http-concurrent.json",
+      "bytes": 2105,
+      "sha256": "2ebc1bbcd5f0f605e7ac80ea779233a3730f6cd3a003f9beb37944cbdff22d1e"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T044650504Z-reports.json",
+      "bytes": 38825,
+      "sha256": "47cda78022597c18533b219b2533114ff6c3f69e7e8a4650ae83f2a591254f98"
+    },
+    {
+      "file": "docs/evidence/2026-10-09T045201384Z-reports.json",
+      "bytes": 38825,
+      "sha256": "51bb3c91659c643fda1d3178ad5c9c46b7a4c52a117680fbf81c06f40161a06a"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-01-express-null-rules.png",
+      "bytes": 16198,
+      "sha256": "d3652b6ce59e6c609d2d274bdb19337e3eab07602ba175b7aaab47c0371542df"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-02-abandon-capacity-before.png",
+      "bytes": 91446,
+      "sha256": "72cbc848144fe3ff522af2164d9792a2dfedf665b6e2c89515e60eccec7141cb"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-03-abandon-pending.png",
+      "bytes": 141421,
+      "sha256": "e12bc5f5ecc69382a9ea419a074b20cb1e02bf1658bd3c56b9ad952d75018023"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-04-abandon-hosted-empty.png",
+      "bytes": 20157,
+      "sha256": "b9dc69e488cb9e23a02723018f18658c83a4ca1aa6dd7894e5e501d2f4087f89"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-05-double-click.png",
+      "bytes": 168608,
+      "sha256": "4b372ccd61984287b61377e7b148f7eff3fdfd2ed4d48980d634930352b114b6"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-06-double-checkout.png",
+      "bytes": 156696,
+      "sha256": "f0f11c72803dde0335a620ae8e052c0bdea7d537b4d19d26340d662252b240bb"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-07-abandon-capacity-after.png",
+      "bytes": 203695,
+      "sha256": "ee0cc2f880cd1eb75012ffd51c5102e0909c48f6165b953afdb632185240ffa4"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-08-abandon-dashboard.png",
+      "bytes": 130693,
+      "sha256": "a2ce672c90da136f03315813d1bd0ea245dd2fbe2895095775c806e6cd3c72a8"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-09-express-return-reporting.png",
+      "bytes": 67982,
+      "sha256": "f98045b7b86ac1a7c97026dfed771878fe26a5ca02a289e0048eccaa338adf5c"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-10-access-events.png",
+      "bytes": 83916,
+      "sha256": "e63e256fe410cd7573a4d15f3bfc29561eb4bc59b50d73de64cc515f108a56b3"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-01-capacity-before.png",
+      "bytes": 203099,
+      "sha256": "c56062dcd51798141b21915ee728c8f26eb7ac37cd8a14d6e7069d4b00d22d06"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-02-hosted-result.png",
+      "bytes": 18877,
+      "sha256": "f25c9d2c034372956bab7ab0d2b510264df152275290fc2ebd8ddba7a983347d"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-03-app-state.png",
+      "bytes": 175168,
+      "sha256": "2d8f64cf0cd5945005e990a33e90696e894c8492b69de596a4d7a846cdb1f958"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-04-capacity-after.png",
+      "bytes": 203503,
+      "sha256": "363a276f5866f5ab9bcb845116e7e8610cdf20b8a8d862c0373156bf2b4e7053"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-01-reservation.png",
+      "bytes": 169961,
+      "sha256": "b61f28690698ab6317b6f2ec42ae0029b2ed736456f082b5d29154b6df32aee3"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-02-hosted.png",
+      "bytes": 50996,
+      "sha256": "a37881716fab3f53d736c5b77d013621fa5c300e504e6d9d82fd88138ea3a924"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-03-processing.png",
+      "bytes": 168802,
+      "sha256": "9377fe94e99eb7063c7137659812d17f3d96287d1dc975dcfa4c59abada84b4c"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-04-confirmation.png",
+      "bytes": 66955,
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-05-dashboard.png",
+      "bytes": 131608,
+      "sha256": "b9908c709ea3eed9455e74621c8717b24c5bbc9ca9159ac1ab814487860dfd04"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-after-fix-refresh.png",
+      "bytes": 66955,
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-refresh.png",
+      "bytes": 66955,
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c"
+    },
+    {
+      "file": "docs/evidence/worldpay-callback-findings-2026-10-09.md",
+      "bytes": 2587,
+      "sha256": "436ccd8546c50265ad5fccd7b1639898f0e69e0c8c3a4d601a2cbe2cb70aa8c3"
+    },
+    {
+      "file": "docs/evidence/worldpay-run-manifest-2026-10-09.json",
+      "bytes": 7084,
+      "sha256": "071b806de09f98c6ad24a254d137b28ea60e9a330ca5c8db0053ebb7168d9a1b"
+    },
+    {
+      "file": "docs/evidence/worldpay-validation-2026-10-08.md",
+      "bytes": 11939,
+      "sha256": "8d7ab96434b622a5e33261f7fbebd498b1d77320a119e16af7bd8d032861b50c"
+    },
+    {
+      "file": "docs/outreach/e2pay-inquiry-draft.md",
+      "bytes": 956,
+      "sha256": "f8754718c639fa93f2efcd1bcc3e3811c9375f110be9e1f65d22ec39613f2f19"
+    },
+    {
+      "file": "docs/outreach/fiuu-contact-form-draft.md",
+      "bytes": 838,
+      "sha256": "105b0ae0fc0d036d18cc931c4d1c4f75a238ede87a727405b1c0bae790ddeccc"
+    },
+    {
+      "file": "docs/outreach/worldpay-implementation-support-draft.md",
+      "bytes": 1625,
+      "sha256": "c3aa99ddbbda869b4f9ab073804da3c73981620539c58a6eceb9b9e79e15f6fe"
+    },
+    {
+      "file": "docs/reports/Worldpay and E2Pay validation evidence update.docx",
+      "bytes": 5474863,
+      "sha256": "994fcda94d40a1bb0d581e7beaec781f39c1eee81cea584e8745499d2f80de73"
+    },
+    {
+      "file": "docs/reports/worldpay-e2pay-validation-source.md",
+      "bytes": 32019,
+      "sha256": "a1c77bcd3facd79e562849b3f863d16b404753d53ec797167af5526712a5c999"
+    }
+  ],
+  "reviewFile": "docs/reports/worldpay-full-changed-files.html"
+}

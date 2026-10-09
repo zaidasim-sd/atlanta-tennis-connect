@@ -1,0 +1,171 @@
+{
+  "savedUtc": "2026-10-09T05:17:22.290117+00:00",
+  "repository": {
+    "remoteOutput": "origin\thttps://github.com/zaidasim-sd/atlanta-tennis-connect.git (fetch)\norigin\thttps://github.com/zaidasim-sd/atlanta-tennis-connect.git (push)\n",
+    "branch": "worldpay",
+    "startingCommit": "891965060a58839eb9a3ad273f54683580546069",
+    "newWorkPushed": false
+  },
+  "environment": {
+    "paymentProvider": "worldpay",
+    "worldpayEnvironment": "sandbox",
+    "database": "worldpay_evidence_20261008",
+    "apiPort": 3001,
+    "frontendPort": 5173,
+    "backgroundJobsStarted": false,
+    "productionPaymentEndpointsCalled": false
+  },
+  "users": [
+    {
+      "email": "worldpay.evidence.20261008@example.test",
+      "method": "Normal browser signup",
+      "passwordRetained": false
+    },
+    {
+      "email": "worldpay.concurrent.20261009@example.test",
+      "method": "Normal API signup",
+      "passwordRetained": false
+    }
+  ],
+  "authenticationBypassAdded": false,
+  "tests": {
+    "baselineBackend": {
+      "pass": 44,
+      "fail": 0
+    },
+    "finalBackendPaymentAndAuth": {
+      "pass": 45,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "raw": "docs/evidence/2026-10-09-final-backend.txt"
+    },
+    "supplementaryBackendUnit": {
+      "pass": 7,
+      "fail": 0,
+      "raw": "docs/evidence/2026-10-09-final-backend-unit.txt"
+    },
+    "totalFinalBackendTests": 52,
+    "frontendTypeScript": "pass",
+    "apiTypeScript": "pass"
+  },
+  "abandonment": {
+    "closedUtc": "2026-10-08T12:36:53.898Z",
+    "reconciledUtc": "2026-10-09T04:28:00.611Z",
+    "releaseExactlyAtDeadlineProven": false
+  },
+  "officialTestInputSource": "https://docs.worldpay.com/assets/pdf/MercuryPay_Express_Vantiv_Testing_Quick_Reference_03092021.pdf",
+  "cardDataRetained": false,
+  "evidenceFormat": "Parsed provider XML with field allowlist redaction. Not byte for byte XML.",
+  "portalScreenshotObtained": false,
+  "genuineNotificationObtained": false,
+  "outreachSent": false,
+  "cleanup": "docs/evidence/2026-10-09-cleanup.json",
+  "screenshots": [
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-01-express-null-rules.png",
+      "sha256": "d3652b6ce59e6c609d2d274bdb19337e3eab07602ba175b7aaab47c0371542df",
+      "savedUtc": "2026-10-08T12:35:49.390128+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-02-abandon-capacity-before.png",
+      "sha256": "72cbc848144fe3ff522af2164d9792a2dfedf665b6e2c89515e60eccec7141cb",
+      "savedUtc": "2026-10-08T12:36:36.224493+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-03-abandon-pending.png",
+      "sha256": "e12bc5f5ecc69382a9ea419a074b20cb1e02bf1658bd3c56b9ad952d75018023",
+      "savedUtc": "2026-10-08T12:36:45.519302+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-04-abandon-hosted-empty.png",
+      "sha256": "b9dc69e488cb9e23a02723018f18658c83a4ca1aa6dd7894e5e501d2f4087f89",
+      "savedUtc": "2026-10-08T12:36:53.897005+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-05-double-click.png",
+      "sha256": "4b372ccd61984287b61377e7b148f7eff3fdfd2ed4d48980d634930352b114b6",
+      "savedUtc": "2026-10-08T12:41:25.893839+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-08-06-double-checkout.png",
+      "sha256": "f0f11c72803dde0335a620ae8e052c0bdea7d537b4d19d26340d662252b240bb",
+      "savedUtc": "2026-10-08T12:41:53.164293+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-07-abandon-capacity-after.png",
+      "sha256": "ee0cc2f880cd1eb75012ffd51c5102e0909c48f6165b953afdb632185240ffa4",
+      "savedUtc": "2026-10-09T04:30:11.958080+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-08-abandon-dashboard.png",
+      "sha256": "a2ce672c90da136f03315813d1bd0ea245dd2fbe2895095775c806e6cd3c72a8",
+      "savedUtc": "2026-10-09T04:30:44.032190+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-09-express-return-reporting.png",
+      "sha256": "f98045b7b86ac1a7c97026dfed771878fe26a5ca02a289e0048eccaa338adf5c",
+      "savedUtc": "2026-10-09T04:30:53.548458+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-10-access-events.png",
+      "sha256": "e63e256fe410cd7573a4d15f3bfc29561eb4bc59b50d73de64cc515f108a56b3",
+      "savedUtc": "2026-10-09T04:39:57.131459+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-01-capacity-before.png",
+      "sha256": "c56062dcd51798141b21915ee728c8f26eb7ac37cd8a14d6e7069d4b00d22d06",
+      "savedUtc": "2026-10-09T04:38:47.364747+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-02-hosted-result.png",
+      "sha256": "f25c9d2c034372956bab7ab0d2b510264df152275290fc2ebd8ddba7a983347d",
+      "savedUtc": "2026-10-09T04:41:16.530591+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-03-app-state.png",
+      "sha256": "2d8f64cf0cd5945005e990a33e90696e894c8492b69de596a4d7a846cdb1f958",
+      "savedUtc": "2026-10-09T04:42:51.614316+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-decline-04-capacity-after.png",
+      "sha256": "363a276f5866f5ab9bcb845116e7e8610cdf20b8a8d862c0373156bf2b4e7053",
+      "savedUtc": "2026-10-09T04:43:54.085695+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-01-reservation.png",
+      "sha256": "b61f28690698ab6317b6f2ec42ae0029b2ed736456f082b5d29154b6df32aee3",
+      "savedUtc": "2026-10-09T04:36:01.159751+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-02-hosted.png",
+      "sha256": "a37881716fab3f53d736c5b77d013621fa5c300e504e6d9d82fd88138ea3a924",
+      "savedUtc": "2026-10-09T04:36:44.353971+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-03-processing.png",
+      "sha256": "9377fe94e99eb7063c7137659812d17f3d96287d1dc975dcfa4c59abada84b4c",
+      "savedUtc": "2026-10-09T04:37:08.994891+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-04-confirmation.png",
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c",
+      "savedUtc": "2026-10-09T04:37:48.398015+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-05-dashboard.png",
+      "sha256": "b9908c709ea3eed9455e74621c8717b24c5bbc9ca9159ac1ab814487860dfd04",
+      "savedUtc": "2026-10-09T04:38:35.521443+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-after-fix-refresh.png",
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c",
+      "savedUtc": "2026-10-09T04:51:40.242718+00:00"
+    },
+    {
+      "file": "docs/evidence/screenshots/2026-10-09-success-refresh.png",
+      "sha256": "cd0c97106544ca9858b0dd8e621b62326f7a2771bd68b776a9a43382c687a40c",
+      "savedUtc": "2026-10-09T04:38:12.153572+00:00"
+    }
+  ]
+}

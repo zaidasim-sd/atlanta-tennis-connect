@@ -1,0 +1,79 @@
+{
+  "utc": "2026-10-09T04:44:24.800Z",
+  "environment": "sandbox",
+  "transport": "authenticated local HTTP",
+  "calls": 8,
+  "capacityBefore": 10,
+  "testUser": {
+    "email": "worldpay.concurrent.20261009@example.test",
+    "method": "Normal API signup",
+    "passwordSaved": false
+  },
+  "responses": [
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    },
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    },
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    },
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    },
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    },
+    {
+      "httpStatus": 500,
+      "ok": false,
+      "error": "Worldpay checkout creation is unresolved; contact the organizer before retrying"
+    },
+    {
+      "httpStatus": 500,
+      "ok": false,
+      "error": "Worldpay checkout creation is unresolved; contact the organizer before retrying"
+    },
+    {
+      "httpStatus": 201,
+      "ok": true,
+      "reservationId": "6ac8712dd322b225fc340789",
+      "status": "payment_pending"
+    }
+  ],
+  "uniqueReservationResponses": 1,
+  "reservationCount": 1,
+  "setupCount": 1,
+  "capacityAfterCreate": 9,
+  "confirmedCount": 0,
+  "providerStates": [
+    {
+      "orderReference": "6ac8712dd322b225fc340789",
+      "state": {
+        "paymentIntentId": "worldpay_6ac8712dd322b225fc340789",
+        "status": "payment_pending",
+        "amountCents": 3500,
+        "currency": "usd"
+      }
+    }
+  ],
+  "note": "Unpaid hosted setup has no Reporting transaction. Zero charge records is expected before card submission. Portal counts are not verified.",
+  "capacityAfterVerifiedCancellation": 10,
+  "finishedUtc": "2026-10-09T04:44:36.223Z"
+}

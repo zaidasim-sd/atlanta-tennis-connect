@@ -1,0 +1,90 @@
+{
+  "utc": "2026-10-08T12:37:58.407Z",
+  "mode": "snapshot",
+  "environment": "sandbox",
+  "apiRecords": [
+    {
+      "utc": "2026-10-08T12:38:01.743Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "073801",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-08T12:38:03.847Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "073803",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    }
+  ],
+  "before": [
+    {
+      "reservationId": "6ac78e559a3e1e883801d9cf",
+      "orderReference": "6ac78e559a3e1e883801d9cf",
+      "league": "evidence-abandon",
+      "reservationStatus": "payment_pending",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:36:37.744Z",
+      "expiresAt": "2026-10-08T12:51:37.744Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78e559a3e1e883801d9cf",
+        "status": "payment_pending",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "704B40A9-44B5-4B75-9323-EDCC553A8292",
+      "capacity": 9,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    }
+  ],
+  "after": [
+    {
+      "reservationId": "6ac78e559a3e1e883801d9cf",
+      "orderReference": "6ac78e559a3e1e883801d9cf",
+      "league": "evidence-abandon",
+      "reservationStatus": "payment_pending",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:36:37.744Z",
+      "expiresAt": "2026-10-08T12:51:37.744Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78e559a3e1e883801d9cf",
+        "status": "payment_pending",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "704B40A9-44B5-4B75-9323-EDCC553A8292",
+      "capacity": 9,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    }
+  ],
+  "finishedUtc": "2026-10-08T12:38:04.586Z"
+}

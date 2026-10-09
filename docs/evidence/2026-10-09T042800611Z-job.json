@@ -1,0 +1,298 @@
+{
+  "utc": "2026-10-09T04:28:00.611Z",
+  "mode": "job",
+  "environment": "sandbox",
+  "apiRecords": [
+    {
+      "utc": "2026-10-09T04:28:04.990Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232804",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:06.147Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232806",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:07.520Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232807",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:07.547Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232807",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:09.389Z",
+      "response": {
+        "TransactionSetupExpireResponse": "[REDACTED]"
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:09.392Z",
+      "response": {
+        "TransactionSetupExpireResponse": "[REDACTED]"
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:10.003Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232809",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:10.005Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232809",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:10.497Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232810",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:10.503Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232810",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:11.814Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232811",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-09T04:28:13.029Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "90",
+            "ExpressResponseMessage": "No Record(s)",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "232812",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": ""
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    }
+  ],
+  "before": [
+    {
+      "reservationId": "6ac78e559a3e1e883801d9cf",
+      "orderReference": "6ac78e559a3e1e883801d9cf",
+      "league": "evidence-abandon",
+      "reservationStatus": "payment_pending",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:36:37.744Z",
+      "expiresAt": "2026-10-08T12:51:37.744Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78e559a3e1e883801d9cf",
+        "status": "payment_pending",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "704B40A9-44B5-4B75-9323-EDCC553A8292",
+      "capacity": 9,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    },
+    {
+      "reservationId": "6ac78f769a3e1e883801daa6",
+      "orderReference": "6ac78f769a3e1e883801daa6",
+      "league": "evidence-double",
+      "reservationStatus": "payment_pending",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:41:26.092Z",
+      "expiresAt": "2026-10-08T12:56:26.092Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78f769a3e1e883801daa6",
+        "status": "payment_pending",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "D59C182B-FDC5-4248-8495-507EA269A04A",
+      "capacity": 9,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    }
+  ],
+  "jobs": [
+    {
+      "reconciled": 2,
+      "errors": 0
+    },
+    {
+      "reconciled": 0,
+      "errors": 0
+    }
+  ],
+  "after": [
+    {
+      "reservationId": "6ac78e559a3e1e883801d9cf",
+      "orderReference": "6ac78e559a3e1e883801d9cf",
+      "league": "evidence-abandon",
+      "reservationStatus": "expired",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:36:37.744Z",
+      "expiresAt": "2026-10-08T12:51:37.744Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78e559a3e1e883801d9cf",
+        "status": "cancelled",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "704B40A9-44B5-4B75-9323-EDCC553A8292",
+      "capacity": 10,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    },
+    {
+      "reservationId": "6ac78f769a3e1e883801daa6",
+      "orderReference": "6ac78f769a3e1e883801daa6",
+      "league": "evidence-double",
+      "reservationStatus": "expired",
+      "amountCents": 3500,
+      "heldAt": "2026-10-08T12:41:26.092Z",
+      "expiresAt": "2026-10-08T12:56:26.092Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac78f769a3e1e883801daa6",
+        "status": "cancelled",
+        "amountCents": 3500,
+        "currency": "usd"
+      },
+      "setupId": "D59C182B-FDC5-4248-8495-507EA269A04A",
+      "capacity": 10,
+      "reservationCount": 1,
+      "confirmedCount": 0,
+      "setupCount": 1,
+      "observations": []
+    }
+  ],
+  "finishedUtc": "2026-10-09T04:28:13.851Z"
+}

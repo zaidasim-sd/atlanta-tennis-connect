@@ -1,0 +1,365 @@
+{
+  "utc": "2026-10-08T12:41:09.681Z",
+  "mode": "reverse",
+  "environment": "sandbox",
+  "apiRecords": [
+    {
+      "utc": "2026-10-08T12:41:13.733Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "0",
+            "ExpressResponseMessage": "Success",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "074113",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": {
+                "Item": {
+                  "TransactionID": "674877436",
+                  "AcceptorID": "[REDACTED]",
+                  "AccountID": "[REDACTED]",
+                  "Name": "[REDACTED]",
+                  "TerminalID": "[REDACTED]",
+                  "ApplicationID": "[REDACTED]",
+                  "ApprovalNumber": "[REDACTED]",
+                  "ApprovedAmount": "40.00",
+                  "CVVResponseCode": "[REDACTED]",
+                  "ExpirationMonth": "[REDACTED]",
+                  "ExpirationYear": "[REDACTED]",
+                  "ExpressResponseCode": "0",
+                  "ExpressResponseMessage": "Approved",
+                  "HostBatchID": "[REDACTED]",
+                  "HostResponseCode": "[REDACTED]",
+                  "OriginalAuthorizedAmount": "[REDACTED]",
+                  "ReferenceNumber": "6ac73581002db8be709a38e3",
+                  "TicketNumber": "[REDACTED]",
+                  "TrackingID": "[REDACTED]",
+                  "TerminalType": "[REDACTED]",
+                  "TransactionAmount": "40.00",
+                  "TransactionStatus": "Authorized",
+                  "TransactionStatusCode": "5",
+                  "TransactionType": "CreditCardAuthorization",
+                  "CardNumberMasked": "[REDACTED]",
+                  "CardLogo": "[REDACTED]",
+                  "CardType": "[REDACTED]",
+                  "TrackDataPresent": "[REDACTED]",
+                  "HostTransactionID": "[REDACTED]",
+                  "TransactionSetupID": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+                  "ExpressTransactionDate": "20261008",
+                  "ExpressTransactionTime": "011813",
+                  "TimeStamp": "2026-10-08T01:18:13.613",
+                  "LaneNumber": "[REDACTED]",
+                  "IntegrationTypeID": "[REDACTED]",
+                  "SystemTraceAuditNumber": "[REDACTED]",
+                  "CardLevelResults": "[REDACTED]",
+                  "RetrievalReferenceNumber": "[REDACTED]",
+                  "TerminalData": "[REDACTED]",
+                  "MerchantCategoryCode": "[REDACTED]",
+                  "CardInputCode": "[REDACTED]",
+                  "NetworkTransactionID": "[REDACTED]"
+                }
+              }
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-08T12:41:15.929Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "0",
+            "ExpressResponseMessage": "Success",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "074115",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": {
+                "Item": {
+                  "TransactionID": "674877436",
+                  "AcceptorID": "[REDACTED]",
+                  "AccountID": "[REDACTED]",
+                  "Name": "[REDACTED]",
+                  "TerminalID": "[REDACTED]",
+                  "ApplicationID": "[REDACTED]",
+                  "ApprovalNumber": "[REDACTED]",
+                  "ApprovedAmount": "40.00",
+                  "CVVResponseCode": "[REDACTED]",
+                  "ExpirationMonth": "[REDACTED]",
+                  "ExpirationYear": "[REDACTED]",
+                  "ExpressResponseCode": "0",
+                  "ExpressResponseMessage": "Approved",
+                  "HostBatchID": "[REDACTED]",
+                  "HostResponseCode": "[REDACTED]",
+                  "OriginalAuthorizedAmount": "[REDACTED]",
+                  "ReferenceNumber": "6ac73581002db8be709a38e3",
+                  "TicketNumber": "[REDACTED]",
+                  "TrackingID": "[REDACTED]",
+                  "TerminalType": "[REDACTED]",
+                  "TransactionAmount": "40.00",
+                  "TransactionStatus": "Authorized",
+                  "TransactionStatusCode": "5",
+                  "TransactionType": "CreditCardAuthorization",
+                  "CardNumberMasked": "[REDACTED]",
+                  "CardLogo": "[REDACTED]",
+                  "CardType": "[REDACTED]",
+                  "TrackDataPresent": "[REDACTED]",
+                  "HostTransactionID": "[REDACTED]",
+                  "TransactionSetupID": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+                  "ExpressTransactionDate": "20261008",
+                  "ExpressTransactionTime": "011813",
+                  "TimeStamp": "2026-10-08T01:18:13.613",
+                  "LaneNumber": "[REDACTED]",
+                  "IntegrationTypeID": "[REDACTED]",
+                  "SystemTraceAuditNumber": "[REDACTED]",
+                  "CardLevelResults": "[REDACTED]",
+                  "RetrievalReferenceNumber": "[REDACTED]",
+                  "TerminalData": "[REDACTED]",
+                  "MerchantCategoryCode": "[REDACTED]",
+                  "CardInputCode": "[REDACTED]",
+                  "NetworkTransactionID": "[REDACTED]"
+                }
+              }
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-08T12:41:16.639Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "0",
+            "ExpressResponseMessage": "Success",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "074116",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": {
+                "Item": {
+                  "TransactionID": "674877436",
+                  "AcceptorID": "[REDACTED]",
+                  "AccountID": "[REDACTED]",
+                  "Name": "[REDACTED]",
+                  "TerminalID": "[REDACTED]",
+                  "ApplicationID": "[REDACTED]",
+                  "ApprovalNumber": "[REDACTED]",
+                  "ApprovedAmount": "40.00",
+                  "CVVResponseCode": "[REDACTED]",
+                  "ExpirationMonth": "[REDACTED]",
+                  "ExpirationYear": "[REDACTED]",
+                  "ExpressResponseCode": "0",
+                  "ExpressResponseMessage": "Approved",
+                  "HostBatchID": "[REDACTED]",
+                  "HostResponseCode": "[REDACTED]",
+                  "OriginalAuthorizedAmount": "[REDACTED]",
+                  "ReferenceNumber": "6ac73581002db8be709a38e3",
+                  "TicketNumber": "[REDACTED]",
+                  "TrackingID": "[REDACTED]",
+                  "TerminalType": "[REDACTED]",
+                  "TransactionAmount": "40.00",
+                  "TransactionStatus": "Authorized",
+                  "TransactionStatusCode": "5",
+                  "TransactionType": "CreditCardAuthorization",
+                  "CardNumberMasked": "[REDACTED]",
+                  "CardLogo": "[REDACTED]",
+                  "CardType": "[REDACTED]",
+                  "TrackDataPresent": "[REDACTED]",
+                  "HostTransactionID": "[REDACTED]",
+                  "TransactionSetupID": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+                  "ExpressTransactionDate": "20261008",
+                  "ExpressTransactionTime": "011813",
+                  "TimeStamp": "2026-10-08T01:18:13.613",
+                  "LaneNumber": "[REDACTED]",
+                  "IntegrationTypeID": "[REDACTED]",
+                  "SystemTraceAuditNumber": "[REDACTED]",
+                  "CardLevelResults": "[REDACTED]",
+                  "RetrievalReferenceNumber": "[REDACTED]",
+                  "TerminalData": "[REDACTED]",
+                  "MerchantCategoryCode": "[REDACTED]",
+                  "CardInputCode": "[REDACTED]",
+                  "NetworkTransactionID": "[REDACTED]"
+                }
+              }
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-08T12:41:17.280Z",
+      "response": {
+        "CreditCardReversalResponse": {
+          "Response": {
+            "IdempotentMatch": "[REDACTED]",
+            "ExpressResponseCode": "20",
+            "ExpressResponseMessage": "Declined",
+            "HostResponseCode": "[REDACTED]",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "043248",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "Batch": "[REDACTED]",
+            "Card": "[REDACTED]",
+            "Transaction": {
+              "TransactionID": "674897104",
+              "ApprovalNumber": "[REDACTED]",
+              "ReferenceNumber": "6ac73581002db8be709a38e3",
+              "AcquirerData": "[REDACTED]",
+              "ProcessorName": "[REDACTED]",
+              "TransactionStatus": "Declined",
+              "TransactionStatusCode": "2",
+              "HostTransactionID": "[REDACTED]",
+              "PINlessPOSConversionIndicator": "[REDACTED]",
+              "RetrievalReferenceNumber": "[REDACTED]",
+              "SystemTraceAuditNumber": "[REDACTED]"
+            },
+            "Terminal": "[REDACTED]"
+          }
+        }
+      }
+    },
+    {
+      "utc": "2026-10-08T12:41:17.790Z",
+      "response": {
+        "TransactionQueryResponse": {
+          "Response": {
+            "ExpressResponseCode": "0",
+            "ExpressResponseMessage": "Success",
+            "ExpressTransactionDate": "20261008",
+            "ExpressTransactionTime": "074117",
+            "ExpressTransactionTimezone": "UTC-05:00:00",
+            "ReportingData": {
+              "Items": {
+                "Item": {
+                  "TransactionID": "674877436",
+                  "AcceptorID": "[REDACTED]",
+                  "AccountID": "[REDACTED]",
+                  "Name": "[REDACTED]",
+                  "TerminalID": "[REDACTED]",
+                  "ApplicationID": "[REDACTED]",
+                  "ApprovalNumber": "[REDACTED]",
+                  "ApprovedAmount": "40.00",
+                  "CVVResponseCode": "[REDACTED]",
+                  "ExpirationMonth": "[REDACTED]",
+                  "ExpirationYear": "[REDACTED]",
+                  "ExpressResponseCode": "0",
+                  "ExpressResponseMessage": "Approved",
+                  "HostBatchID": "[REDACTED]",
+                  "HostResponseCode": "[REDACTED]",
+                  "OriginalAuthorizedAmount": "[REDACTED]",
+                  "ReferenceNumber": "6ac73581002db8be709a38e3",
+                  "TicketNumber": "[REDACTED]",
+                  "TrackingID": "[REDACTED]",
+                  "TerminalType": "[REDACTED]",
+                  "TransactionAmount": "40.00",
+                  "TransactionStatus": "Authorized",
+                  "TransactionStatusCode": "5",
+                  "TransactionType": "CreditCardAuthorization",
+                  "CardNumberMasked": "[REDACTED]",
+                  "CardLogo": "[REDACTED]",
+                  "CardType": "[REDACTED]",
+                  "TrackDataPresent": "[REDACTED]",
+                  "HostTransactionID": "[REDACTED]",
+                  "TransactionSetupID": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+                  "ExpressTransactionDate": "20261008",
+                  "ExpressTransactionTime": "011813",
+                  "TimeStamp": "2026-10-08T01:18:13.613",
+                  "LaneNumber": "[REDACTED]",
+                  "IntegrationTypeID": "[REDACTED]",
+                  "SystemTraceAuditNumber": "[REDACTED]",
+                  "CardLevelResults": "[REDACTED]",
+                  "RetrievalReferenceNumber": "[REDACTED]",
+                  "TerminalData": "[REDACTED]",
+                  "MerchantCategoryCode": "[REDACTED]",
+                  "CardInputCode": "[REDACTED]",
+                  "NetworkTransactionID": "[REDACTED]"
+                }
+              }
+            },
+            "ReportingID": "[REDACTED]"
+          }
+        }
+      }
+    }
+  ],
+  "before": [
+    {
+      "reservationId": "6ac73581002db8be709a38e3",
+      "orderReference": "6ac73581002db8be709a38e3",
+      "league": "l-sandysprings-mxd35",
+      "reservationStatus": "payment_pending",
+      "amountCents": 4000,
+      "heldAt": "2026-10-08T06:17:37.330Z",
+      "expiresAt": "2026-10-08T06:32:37.330Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac73581002db8be709a38e3",
+        "status": "authorized",
+        "amountCents": 4000,
+        "currency": "usd"
+      },
+      "setupId": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+      "capacity": 4,
+      "reservationCount": 25,
+      "confirmedCount": 24,
+      "setupCount": 1,
+      "observations": [
+        {
+          "amountCents": 4000,
+          "currency": "USD",
+          "currencySource": "merchant_configuration",
+          "providerEventTime": "2026-10-08T01:18:13.613",
+          "providerStatus": "Authorized",
+          "providerStatusCode": "5",
+          "transactionId": "674877436",
+          "transactionType": "CreditCardAuthorization"
+        }
+      ]
+    }
+  ],
+  "reversal": {
+    "error": "Worldpay request failed (code 20)",
+    "code": "20",
+    "providerMessage": "Declined"
+  },
+  "after": [
+    {
+      "reservationId": "6ac73581002db8be709a38e3",
+      "orderReference": "6ac73581002db8be709a38e3",
+      "league": "l-sandysprings-mxd35",
+      "reservationStatus": "payment_pending",
+      "amountCents": 4000,
+      "heldAt": "2026-10-08T06:17:37.330Z",
+      "expiresAt": "2026-10-08T06:32:37.330Z",
+      "provider": {
+        "paymentIntentId": "worldpay_6ac73581002db8be709a38e3",
+        "status": "authorized",
+        "amountCents": 4000,
+        "currency": "usd"
+      },
+      "setupId": "4E52D3FA-A5F8-452D-AE0B-2AA7D66D4F07",
+      "capacity": 4,
+      "reservationCount": 25,
+      "confirmedCount": 24,
+      "setupCount": 1,
+      "observations": [
+        {
+          "amountCents": 4000,
+          "currency": "USD",
+          "currencySource": "merchant_configuration",
+          "providerEventTime": "2026-10-08T01:18:13.613",
+          "providerStatus": "Authorized",
+          "providerStatusCode": "5",
+          "transactionId": "674877436",
+          "transactionType": "CreditCardAuthorization"
+        }
+      ]
+    }
+  ],
+  "finishedUtc": "2026-10-08T12:41:18.717Z"
+}

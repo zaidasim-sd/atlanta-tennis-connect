@@ -1,0 +1,27 @@
+{
+  "utc": "2026-10-09T04:54:29.005Z",
+  "database": "worldpay_evidence_20261008",
+  "deleted": true,
+  "removedCounts": {
+    "auditlogs": 10,
+    "players": 2,
+    "seasons": 1,
+    "reservations": 5,
+    "leagues": 5,
+    "tournamenthistories": 0,
+    "authsessions": 1,
+    "worldpayobservations": 3,
+    "worldpayoperations": 0,
+    "worldpaypayments": 5,
+    "authattempts": 2,
+    "accounts": 2
+  },
+  "testUsersRemoved": [
+    "worldpay.evidence.20261008@example.test",
+    "worldpay.concurrent.20261009@example.test"
+  ],
+  "testOnlyAccessPathAdded": false,
+  "originalApplicationDatabaseModifiedByCleanup": false,
+  "providerTransactions": "Retained in the sandbox. No refund or additional reversal submitted.",
+  "temporaryCardInputMaterial": "Removed after browser use"
+}
