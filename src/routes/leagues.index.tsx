@@ -312,7 +312,7 @@ function BrowseLeagues() {
         </div>
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
           <Reveal>
-            <p className="eyebrow text-accent drop-shadow-md">Metro Atlanta Leagues</p>
+            <p className="eyebrow text-accent drop-shadow-md">Atlanta</p>
             <h1 className="mt-2 text-3xl font-bold sm:text-5xl drop-shadow-lg">Browse Leagues</h1>
             <p className="mt-3 max-w-xl text-white/90 drop-shadow-md text-sm sm:text-base">
               Explore official leagues across Atlanta by league type, skill rating, season, and metro area.
