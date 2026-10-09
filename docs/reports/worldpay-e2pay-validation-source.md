@@ -1,8 +1,8 @@
 # Worldpay and E2Pay practical payment validation
 
-Sandbox evidence updated 9 October 2026
+Validation date 9 October 2026
 
-Decision pending merchant and provider confirmation. Fresh success, decline and abandonment are evidenced. Live payment readiness is not established.
+Decision pending merchant and provider confirmation. Sandbox payment success, controlled decline and abandonment recovery are documented. Live payment readiness is not established.
 
 # Requirement status
 
@@ -31,13 +31,13 @@ Decision pending merchant and provider confirmation. Fresh success, decline and 
 
 # Decision and scope
 
-Worldpay Express Hosted Payments is a working sandbox candidate. A fresh browser payment, controlled decline and abandoned checkout recovery have now been recorded. These prove sandbox behavior. They do not establish production approval or live settlement. E2Pay remains blocked until Mr Saad identifies the intended provider and that provider confirms US eligibility and USD charging and settlement.
+Worldpay Express Hosted Payments is a working sandbox candidate. Browser payment success, controlled decline and abandoned checkout recovery were tested. These prove sandbox behavior. They do not establish production approval or live settlement. E2Pay remains blocked until Mr Saad identifies the intended provider and that provider confirms US eligibility and USD charging and settlement.
 
 Recommendation: decision pending merchant and provider confirmation. Continue Worldpay validation while keeping the shared payment interface. Neither provider is ready for an unconditional live payment claim under the assigned requirements.
 
 # Identify E2Pay first
 
-The researched candidate is PT E2Pay Global Utama in Indonesia, identified by Fiuu as an acquired business. This is not yet confirmed as the E2Pay intended by Mr Saad. The earlier reference to PT Sprint Mandiri is unsupported and must not be used. The similarly named e2pay.org website shown in Figure 3 is not identity evidence for this candidate. [2]
+The researched candidate is PT E2Pay Global Utama in Indonesia, identified by Fiuu as an acquired business. This is not yet confirmed as the E2Pay intended by Mr Saad. The similarly named e2pay.org website shown in Figure 3 is not identity evidence for this candidate. [2]
 
 | Required information | Current finding |
 | --- | --- |
@@ -64,7 +64,7 @@ Express requires AccountID, AccountToken, AcceptorID and ApplicationID. These ma
 
 ## Implementation location and provider selection
 
-Repository: https://github.com/zaidasim-sd/atlanta-tennis-connect/tree/worldpay. Origin and the worldpay branch were checked. The starting commit is 891965060a58839eb9a3ad273f54683580546069. New evidence and the confirmation endpoint fix remain local. They are not claimed as pushed. The proof of concept remains in the tennis app, with a separate disposable database for these runs. [1] (https://github.com/zaidasim-sd/atlanta-tennis-connect/tree/worldpay) (https://github.com/zaidasim-sd/atlanta-tennis-connect/tree/worldpay)
+Repository: https://github.com/zaidasim-sd/atlanta-tennis-connect/tree/worldpay. The implementation, report and referenced evidence are published on the worldpay branch in commit 0abce1d09417f66dc615667f05d341a6e2a11fe5. Sandbox tests used a separate disposable database. [1]
 
 PAYMENT_PROVIDER selects mock, stripe or worldpay. The selected adapter is constructed through the shared PaymentProvider interface. Worldpay uses worldpayProvider.ts and worldpayPayment.ts in backend/src/payment, reservationService.ts in backend/src/lib, and the Worldpay checkout component in src/components. Existing reservations retain their provider; finish them before switching environments.
 
@@ -72,7 +72,7 @@ PAYMENT_PROVIDER selects mock, stripe or worldpay. The selected adapter is const
 
 The backend creates a pending reservation with a 15 minute capacity hold and uses its identifier as the unique order reference. A durable session claim prevents concurrent creation of multiple hosted sessions. Card entry occurs on Worldpay. Before registration confirmation, authenticated Reporting checks the order reference, amount and merchant identifiers when supplied. Returned currency is checked when present. Capture TransactionID is saved separately from authorization TransactionID. A browser return alone cannot confirm payment.
 
-Hosted checkout expires after 10 minutes. Reservations hold capacity for 15 minutes. Checkout closure and Reporting must show no live authorization before capacity is released. Unresolved state deliberately retains capacity beyond the deadline. This differs from the brief's unconditional release rule on purpose, to prevent a charge after a spot has been sold again. The new decline and abandonment runs safely released capacity. [8, 11]
+Hosted checkout expires after 10 minutes. Reservations hold capacity for 15 minutes. Checkout closure and Reporting must show no live authorization before capacity is released. Unresolved state deliberately retains capacity beyond the deadline. This differs from the brief's unconditional release rule on purpose, to prevent a charge after a spot has been sold again. The decline and abandonment tests safely released capacity. [8, 11]
 
 ## Hosted checkout versus direct card entry
 
@@ -82,11 +82,11 @@ The browser return checks TransactionSetupID and ValidationCode, followed by aut
 
 # Practical evidence and test results
 
-Original screenshots remain as historical evidence with sensitive fields redacted. New screenshots were captured through the browser on 8 and 9 October 2026. The fresh success, decline, abandonment, double click and refresh runs are described below. Raw provider evidence is parsed XML with fields outside the allowlist redacted. It is not a byte for byte XML copy. Test results use saved files and are not portal charge counts.
+The screenshots cover provider access, hosted checkout, registration, success, decline, abandonment, double click and refresh. Browser tests were recorded on 8 and 9 October 2026. Sensitive fields are redacted. Raw provider evidence is parsed XML with fields outside the allowlist redacted. It is not a byte for byte XML copy. Test results use saved files and are not portal charge counts.
 
 ## Actual sandbox records
 
-Initial read only verification on 8 October 2026 between 06:36:07 and 06:36:09 UTC returned the records below. Later authenticated Reporting identified capture 674877825 linked to authorization 674877822 for order ending 709a3ae5. Completed authorization indicates provider reported capture completion, not bank settlement. USD below is the merchant configured currency; observed Reporting data did not independently return currency.
+Authenticated Reporting queries identified the records below, including capture 674877825 linked to authorization 674877822 for order ending 709a3ae5. Completed authorization indicates provider reported capture completion, not bank settlement. USD below is the merchant configured currency; observed Reporting data did not independently return currency.
 
 | Order suffix and USD | Worldpay transaction evidence | App result |
 | --- | --- | --- |
@@ -94,24 +94,24 @@ Initial read only verification on 8 October 2026 between 06:36:07 and 06:36:09 U
 | 0f923253   40.00 | 674877186 and 674877189 Declined 674877238 AuthCompleted, code 6 | registered paidAt 06:12:44 UTC |
 | 709a38e3   40.00 | 674877436 Authorized, code 5 | payment_pending No paidAt value |
 
-The earlier successful orders remain historical evidence. Authorization 674877436 remained Authorized in the fresh 9 October state check. The one permitted reversal retry on 8 October at 12:41 UTC again returned code 20, Declined. It was stopped. Capacity remains held and the reservation is unconfirmed. No extra reversal or refund was submitted. [E10]
+Authorization 674877436 remained Authorized in the 9 October state check. Its reversal retry on 8 October at 12:41 UTC returned code 20, Declined. Further attempts were stopped. Capacity remains held and the reservation is unconfirmed. No extra reversal or refund was submitted. [E10]
 
 ## Tests completed and evidence limits
 
 | Case | Result and evidence |
 | --- | --- |
-| Hosted checkout and success | Fresh 3500 cent success on 9 October. One confirmed registration and capture 674988144. New numbered screenshots and E5, E9. Earlier figures are historical. |
-| Decline or failure | Fresh documented 257 cent decline. Authorization 674988272 is Declined. Reservation failed, confirmed count zero and capacity restored to 10. E6 and decline figures. |
+| Hosted checkout and success | 3500 cent payment approved on 9 October. One confirmed registration and capture 674988144. Numbered screenshots and E5, E9. |
+| Decline or failure | Documented 257 cent decline. Authorization 674988272 is Declined. Reservation failed, confirmed count zero and capacity restored to 10. E6 and decline figures. |
 | Unique reference and refresh | Unique order references are saved. Three browser refreshes and two hosted return verifier replays preserved one registration, capture 674988144 and capacity 9. E4, E9. |
 | Double submission | Actual browser double click produced one checkout. Eight authenticated HTTP requests produced one reservation and setup. Six returned 201, two returned 500. No second setup. E2, E7. |
 | Ambiguous creation | Automated test blocks a new payable session after a timeout. Manual recovery still required. |
-| Authorization and capture | Fresh authorization 674988139 is AuthCompleted. Separate capture 674988144 is Approved. One capture is found by reference query. E5, E9. |
-| Cancellation and abandonment | Fresh abandoned checkout expired after no payment. Reporting found no transaction and capacity returned from held 9 to 10. Decline also released safely. Late payment was not run. E3, E6. |
+| Authorization and capture | Authorization 674988139 is AuthCompleted. Separate capture 674988144 is Approved. One capture is found by reference query. E5, E9. |
+| Cancellation and abandonment | Abandoned checkout expired after no payment. Reporting found no transaction and capacity returned from held 9 to 10. Decline also released safely. Late payment was not run. E3, E6. |
 | Webhook and duplicate events | The hosted return verifier was replayed twice. No genuine server notification was available or tested. Reporting replay is not notification replay. E4, E8. |
-| Refund and amount checks | Automated amount and returned currency checks pass. Earlier refund rejection is a prior reported finding with missing raw output. No fresh or successful refund. E11, E13. |
+| Refund and amount checks | Automated amount and returned currency checks pass. Refund rejection was reported, but its raw output is missing. No successful refund is verified. E11, E13. |
 | Provider isolation and code 90 | Automated tests confirm selected adapter only. Reporting No Record(s) is treated as pending only in the exact query context. |
 
-The baseline had 44 passing backend tests. The final suite has 45 passing tests, zero failures, zero skips and zero cancellations. Frontend and API TypeScript checks pass. The extra test verifies that the old browser confirmation route cannot create or change a registration. CORS tests accept configured origins and reject unrelated sites. Actual sandbox evidence and automated tests are labelled separately. [E13]
+The backend payment and authentication suite passed 45 tests. The supplementary backend unit suite passed 7 tests. All 52 tests passed with zero failures, skips or cancellations. Frontend and API TypeScript checks passed. A regression test verifies that browser supplied confirmation cannot create or change a registration. CORS tests accept configured origins and reject unrelated sites. Actual sandbox evidence and automated tests are labelled separately. [E13]
 
 # What must happen before a live payment claim
 
@@ -121,11 +121,11 @@ The baseline had 44 passing backend tests. The final suite has 45 passing tests,
 
 2. Durable transaction evidence is implemented. Amount, reference, reservation, provider status, event time and verification time are recorded. Capture IDs are separate. Observed Reporting data still supplies no currency field. USD is merchant configuration, labelled merchant_configuration, and does not meet independent provider currency verification. Confirm USD presentment and settlement with the approved merchant account. [E5, E9]
 
-3. Fresh success, controlled decline, abandonment, double click, return replay and refresh now have saved evidence. Eight concurrent HTTP create calls produced one reservation and setup, but two requests failed while creation was unresolved. The unpaid setup had no Reporting charge record. Genuine duplicate notification, portal counts and late payment remain open. [E2, E3, E4, E5, E6, E7, E9]
+3. Success, controlled decline, abandonment, double click, return replay and refresh have saved results. Eight concurrent HTTP create calls produced one reservation and setup, but two requests failed while creation was unresolved. The unpaid setup had no Reporting charge record. Genuine duplicate notification, portal counts and late payment remain open. [E2, E3, E4, E5, E6, E7, E9]
 
-4. Authorization 674877436 remains unresolved after one more declined reversal. Capacity stays held. The new decline and abandoned checkout safely released their holds. Automated outage recovery passes. A controlled actual outage and late payment exercise were not run. [E3, E6, E10, E13]
+4. Authorization 674877436 remains unresolved after a declined reversal retry. Capacity stays held. The decline and abandoned checkout safely released their holds. Automated outage recovery passes. A controlled actual outage and late payment exercise were not run. [E3, E6, E10, E13]
 
-5. No successful refund is claimed. The prior report states that a 100 cent return for capture 674877825 returned code 103. The earlier raw refund output file is empty and does not prove that response. A fresh read found a pending refund operation. No refund was submitted in this session. Obtain provider resolution and successful Reporting and portal evidence. Settlement and dispute procedures below are proposals, not completed tests. [E11]
+5. No successful refund is verified. A 100 cent return for capture 674877825 was reported as rejected with code 103. Its raw output file is empty, so that response remains unverified. The stored refund operation is pending. Obtain provider resolution and successful Reporting and portal evidence. Settlement and dispute procedures below are proposals, not completed tests. [E11]
 
 ## Merchant approval and production validation
 
@@ -145,13 +145,13 @@ For the E2Pay candidate, the reviewed material describes hosted checkout, notifi
 
 ## Evidence retained
 
-Saved evidence is under docs/evidence. The status note lists exact filenames for E1 to E14. The original screenshot files remain inputs. New browser screenshots are under docs/evidence/screenshots. Outreach drafts are under docs/outreach and were not sent. Both disposable users and their database were removed after evidence capture. Provider sandbox transaction records remain. No test access path was added. [E12, E14]
+Saved evidence is under docs/evidence. The status note lists exact filenames for E1 to E14. Browser screenshots are under docs/evidence/screenshots and are included as numbered figures. Outreach drafts are under docs/outreach and were not sent. Both disposable users and their database were removed after evidence capture. Provider sandbox transaction records remain. No test access path was added. [E12, E14]
 
-# New witnessed sandbox runs
+# Sandbox test results
 
 Controlled decline: order 6ac8701dd322b225fc340675 used the official Express test card and 257 cent trigger. The hosted page returned Declined. Reporting records authorization 674988272 with transaction status code 2. The app marked the reservation failed, left it unconfirmed and restored capacity to 10. The fee was changed only in the disposable test league. [12, E6]
 
-Abandonment: order 6ac78e559a3e1e883801d9cf reached a blank hosted form and was closed without payment on 8 October at 12:36:53 UTC. Its hold deadline was 12:51:37 UTC. Reconciliation ran on 9 October at 04:28 UTC after the interrupted session resumed. Reporting found no transaction. The reservation expired and held capacity 9 returned to 10. This does not prove release exactly at the deadline. [E3]
+Abandonment: order 6ac78e559a3e1e883801d9cf reached a blank hosted form and was closed without payment on 8 October at 12:36:53 UTC. Its hold deadline was 12:51:37 UTC. Reconciliation ran on 9 October at 04:28 UTC after the hold deadline. Reporting found no transaction. The reservation expired and held capacity 9 returned to 10. This does not prove release exactly at the deadline. [E3]
 
 Success: order 6ac86f32d322b225fc3404e3 completed a 3500 cent payment. Authorization 674988139 is AuthCompleted and capture 674988144 is Approved. The app had one confirmed registration and capacity 9. The hosted return verifier was replayed twice, reconciliation ran twice and the page was refreshed three times. One registration, one capture ID and capacity 9 remained. No video was recorded because the available browser tool has no video recording API. [E4, E5, E9]
 
@@ -159,7 +159,7 @@ Double submission: the browser double click created one checkout for order 6ac78
 
 An unpaid hosted setup has no Reporting charge record. For the paid success order, two Reporting rows are one authorization and one capture. The approved capture count is one. These are authenticated API records, not portal screenshots. Portal completeness and bank settlement remain unverified. No portal account email or authenticated portal access was available. [E9]
 
-Confirmation safeguard: the old browser supplied confirmation endpoint is disabled with HTTP 410. It cannot create a paid registration. A regression test and real local HTTP check verify this. The shared PaymentProvider interface is unchanged. A remaining frontend call to that obsolete endpoint ignores its response but can no longer change server records. Its removal and general success error handling remain follow up work. [E13]
+Confirmation safeguard: the browser supplied confirmation endpoint is disabled with HTTP 410. It cannot create a paid registration. A regression test and real local HTTP check verify this. The shared PaymentProvider interface is unchanged. A remaining frontend call to that obsolete endpoint ignores its response but can no longer change server records. Its removal and general success error handling remain follow up work. [E13]
 
 Cleanup: both disposable users, their sessions and the dedicated test database were removed after evidence capture. Five test leagues and five test reservations were removed. Original application data was not deleted or reset. The provider sandbox transactions remain. No test access path was added. The local test servers and temporary card input material were removed or stopped. [E14]
 
@@ -169,7 +169,7 @@ Cleanup: both disposable users, their sessions and the dedicated test database w
 | Decline | 1 | 0 | 0 |
 | Double click | 0 | 0 | 0 |
 | HTTP concurrency | 0 | 0 | 0 |
-| Fresh success | 2 | 1 | 1 |
+| Success | 2 | 1 | 1 |
 
 ## Saved evidence references
 
@@ -193,11 +193,11 @@ E9 2026-10-09T045201384Z-reports.json, authenticated API only
 
 E10 2026-10-08T124109681Z-reverse.json and 2026-10-09-original-state-check.json
 
-E11 Prior report only. Raw refund output is empty. Current operation is pending. No new refund.
+E11 Reported refund rejection is unverified because raw output is empty. The stored operation is pending. No successful refund is verified.
 
 E12 docs/outreach contains three drafts. None was sent or submitted.
 
-E13 2026-10-09-final-backend.txt, 2026-10-09-final-typescript.txt and confirmation route check JSON
+E13 2026-10-09-final-backend.txt, 2026-10-09-final-backend-unit.txt, 2026-10-09-final-typescript.txt and confirmation route check JSON
 
 E14 2026-10-09-cleanup.json
 
@@ -243,7 +243,7 @@ Owner: the developer completes the remaining evidence and notification work once
 
 ## Screenshot interpretation
 
-The 16 historical figures remain below. Browser address rows and sensitive fields are redacted. The card fields in Figure 10 are redacted. These redactions do not create new test evidence. Figures 14 and 15 do not prove duplicate charge prevention. Fresh browser figures follow the historical appendix.
+The figures show provider access and the application payment workflow. Browser address rows, sensitive fields and the card fields in Figure 10 are redacted. Figures 14 and 15 do not prove duplicate charge prevention. Provider results and registration counts are recorded separately.
 
 # Screenshot evidence
 
@@ -285,7 +285,7 @@ The dashboard includes Express XML and Hosted Payments, the route used for this 
 
 ## Figure 8 Registration before checkout
 
-A USD 40 registration was prepared. This screenshot retains the old Stripe summary label. Shared checkout labels have since been corrected to provider neutral wording; the screenshot predates that change.
+A USD 40 registration was prepared. The captured summary contains a Stripe label. The implemented shared checkout uses provider neutral wording.
 
 # Screenshot evidence
 
@@ -295,7 +295,7 @@ The application offers the hosted checkout and waits for provider confirmation.
 
 ## Figure 10 Worldpay hosted payment form
 
-Historical card input has been redacted. This figure is not fresh test evidence. The new blank hosted form and matching Reporting records provide the current checkout evidence.
+Worldpay collects card details on its hosted payment form. Card input is redacted. Matching Reporting records provide the transaction result.
 
 # Screenshot evidence
 
@@ -323,11 +323,11 @@ The application retains the reservation while payment processing is unresolved.
 
 Reopening the page failed. This does not by itself prove duplicate charge or double booking prevention.
 
-## Figure 16 Further successful registration
+## Figure 16 Successful registration
 
 The application shows a USD 35 registration. The matching completed authorization is recorded in the server evidence.
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 17 Null Processor reference
 
@@ -337,7 +337,7 @@ Shows a processor specific reference. It does not establish the authorization de
 
 Shows 10 available spots before checkout. It does not prove a provider transaction count. Full capture: 2026-10-08-02-abandon-capacity-before.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 19 Abandonment pending reservation
 
@@ -347,7 +347,7 @@ Shows the pending Worldpay handoff. It does not prove payment or expiry. Full ca
 
 Shows the blank hosted form reached before closing. It does not prove expiry or absence of authorization. Full capture: 2026-10-08-04-abandon-hosted-empty.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 21 Double click creation state
 
@@ -357,7 +357,7 @@ Shows the disabled button after the double click. It does not independently prov
 
 Shows one pending checkout in the app. Saved server counts establish one setup; this is not a portal audit. Full capture: 2026-10-08-06-double-checkout.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 23 Abandonment capacity after
 
@@ -367,7 +367,7 @@ Shows capacity restored to 10 after reconciliation. It does not prove release ex
 
 Shows no confirmed registration for the test user at that time. Reporting supplies the no authorization evidence. Full capture: 2026-10-09-08-abandon-dashboard.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 25 Express return and Reporting documentation
 
@@ -377,7 +377,7 @@ Shows browser return validation and Reporting guidance. It does not prove that e
 
 Shows implementation manager provisioning for Access Events. It does not establish Express credential compatibility. Full capture: 2026-10-09-10-access-events.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 27 Controlled decline capacity before
 
@@ -387,7 +387,7 @@ Shows 10 spots before the fee was configured for the decline test. It does not p
 
 Shows the actual Declined banner with card fields excluded. It does not prove app capacity release by itself. Full capture: 2026-10-09-decline-02-hosted-result.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 29 Controlled decline app state
 
@@ -397,7 +397,7 @@ Shows that the reservation ended and was not confirmed. Reporting and server rec
 
 Shows capacity restored to 10. It does not replace the saved zero capture count. Full capture: 2026-10-09-decline-04-capacity-after.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 31 Success sequence 1 reservation
 
@@ -407,7 +407,7 @@ Shows the 35 dollar registration before payment. It does not prove a charge. Ful
 
 Shows the blank Worldpay hosted form and order reference. It does not prove approval. Full capture: 2026-10-09-success-02-hosted.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 33 Success sequence 3 return loading
 
@@ -417,7 +417,7 @@ Shows the app reloading after provider processing. It does not prove payment con
 
 Shows the app confirmed entry. Reporting independently records one approved capture; this screen does not prove settlement. Full capture: 2026-10-09-success-04-confirmation.png
 
-# New browser evidence
+# Browser payment workflow
 
 ## Figure 35 Success sequence 5 dashboard
 
@@ -427,8 +427,8 @@ Shows one confirmed league entry for the test user. It does not prove portal com
 
 Shows the same confirmed entry after refresh. Saved replay counts, not the image alone, prove unchanged registration and capture counts. Full capture: 2026-10-09-success-refresh.png
 
-# New browser evidence
+# Browser payment workflow
 
-## Figure 37 Confirmation after route fix
+## Figure 37 Confirmed registration after refresh
 
-Shows the existing confirmed entry after the endpoint fix. It does not demonstrate a new charge. Full capture: 2026-10-09-success-after-fix-refresh.png
+Shows a confirmed registration during an application refresh. The matching provider capture is recorded separately. Full capture: 2026-10-09-success-after-fix-refresh.png
