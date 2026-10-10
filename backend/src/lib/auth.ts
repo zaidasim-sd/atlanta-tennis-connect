@@ -8,8 +8,21 @@ export interface Identity { accountId: string; playerSlug: string; email: string
 declare global { namespace Express { interface Request { identity?: Identity } } }
 const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 const isProduction = () => process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
-const cookieName = () => isProduction() ? "__Host-atl-session" : "atl-session";
-const cookieOptions = () => ({ httpOnly: true, secure: isProduction(), sameSite: "lax" as const, path: "/" });
+const cookieName = () => process.env.SESSION_COOKIE_NAME || (isProduction() ? "__Host-atl-session" : "atl-session");
+const sameSiteOption = () => (process.env.SESSION_COOKIE_SAMESITE as "lax" | "strict" | "none") || "lax";
+// __Host- cookies must NOT carry a Domain attribute (RFC 6265bis §4.1.3).
+// Silently suppress SESSION_COOKIE_DOMAIN when the cookie name uses the prefix.
+const cookieDomain = () => {
+  if (cookieName().startsWith("__Host-")) return undefined;
+  return process.env.SESSION_COOKIE_DOMAIN || undefined;
+};
+const cookieOptions = () => ({
+  httpOnly: true,
+  secure: isProduction() || sameSiteOption() === "none",
+  sameSite: sameSiteOption(),
+  path: "/",
+  ...(cookieDomain() ? { domain: cookieDomain() } : {}),
+});
 const derive = (password: string, salt: string) => new Promise<Buffer>((resolve, reject) => {
   scrypt(password, salt, 64, { N: 131072, r: 8, p: 1, maxmem: 160 * 1024 * 1024 }, (e, key) => e ? reject(e) : resolve(key));
 });

@@ -41,10 +41,12 @@ function Index() {
             loop 
             muted 
             playsInline 
+            preload="metadata"
             className="h-full w-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-1000 ease-out"
-            poster="https://images.unsplash.com/photo-1499510318569-1a3d67dc3976?q=80&w=464&auto=format&fit=crop"
+            poster="https://images.unsplash.com/photo-1499510318569-1a3d67dc3976?q=80&w=1200&auto=format&fit=crop"
           >
-            <source src="https://res.cloudinary.com/dereplqra/video/upload/v1789104060/281992_large_1_xy63dw.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/dereplqra/video/upload/w_1280,c_limit,q_auto,f_webm/v1789104060/281992_large_1_xy63dw.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dereplqra/video/upload/w_1280,c_limit,q_auto,vc_h264/v1789104060/281992_large_1_xy63dw.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         </div>

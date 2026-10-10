@@ -84,6 +84,10 @@ function LeagueDetail() {
         <div className="absolute inset-0">
           <img 
             src="https://images.unsplash.com/photo-1635842939844-1fbf6bea8e78?q=80&w=1200&auto=format&fit=crop" 
+            srcSet="https://images.unsplash.com/photo-1635842939844-1fbf6bea8e78?q=80&w=640&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1635842939844-1fbf6bea8e78?q=80&w=1024&auto=format&fit=crop 1024w, https://images.unsplash.com/photo-1635842939844-1fbf6bea8e78?q=80&w=1400&auto=format&fit=crop 1400w"
+            sizes="100vw"
+            loading="lazy"
+            decoding="async"
             alt="Tennis court" 
             className="h-full w-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000 ease-out"
           />

@@ -150,8 +150,12 @@ export function SiteFooter() {
                   aria-label="Vision71 Technologies"
                 >
                   <img
-                    src="/v71_white (1).png"
+                    src="/v71_white.png"
                     alt="Vision71 Technologies"
+                    width={144}
+                    height={48}
+                    loading="lazy"
+                    decoding="async"
                     className="h-12 w-auto"
                   />
                 </a>

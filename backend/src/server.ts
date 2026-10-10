@@ -25,6 +25,7 @@ import { allowedOrigin, protectOrigin } from "./lib/origins";
 import { expireReservations } from "./jobs/expireReservations";
 import { reconcilePayments } from "./jobs/reconcilePayments";
 import { wrap, ok, err } from "./lib/apiResponse";
+// @ts-ignore
 import { WebSocketServer, WebSocket } from "ws";
 import { capacityEvents } from "./lib/events";
 
@@ -108,7 +109,7 @@ if (require.main === module) {
       });
 
       const wss = new WebSocketServer({ server, path: "/ws" });
-      wss.on("connection", (ws) => {
+      wss.on("connection", (ws: any) => {
         ws.send(JSON.stringify({ type: "connected", ts: Date.now() }));
       });
 
