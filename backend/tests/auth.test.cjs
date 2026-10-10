@@ -171,3 +171,36 @@ test("private responses are not cacheable and login rate limiting persists in Mo
   for (let i = 0; i < 10; i++) assert.equal((await request("/api/auth/login", { method: "POST", body: { email: "a@example.test", password: "wrong" } })).status, 401);
   assert.equal((await request("/api/auth/login", { method: "POST", body: { email: "a@example.test", password } })).status, 429);
 });
+
+
+test("league creation requires an organiser session and returns 201", async () => {
+  const body = { id: "l-created", seasonId: "s-sec", name: "Created league", format: "men-singles", skillLevel: "3.5", feeCents: 100, scheduleDay: "Tuesday", scheduleTime: "6 PM", venue: "Test", playerLimit: 4 };
+  assert.equal((await request("/api/leagues", { method: "POST", body })).status, 401);
+  assert.equal((await request("/api/leagues", { method: "POST", who: "a", body: { ...body, role: "organizer" } })).status, 403);
+  assert.equal(await League.countDocuments({ slug: body.id }), 0);
+  const created = await request("/api/leagues", { method: "POST", who: "org", body });
+  assert.equal(created.status, 201);
+  assert.equal(created.body.data.id, body.id);
+  assert.equal(await League.countDocuments({ slug: body.id }), 1);
+});
+
+test("CORS preflights allow only exact project deployment URLs", async () => {
+  const previous = process.env.VERCEL_URL;
+  process.env.VERCEL_URL = "atlanta-tennis-preview.vercel.app";
+  try {
+    for (const origin of ["https://atlanta-tennis-preview.vercel.app", process.env.CLIENT_URL]) {
+      const res = await fetch(base + "/api/leagues", { method: "OPTIONS", headers: { Origin: origin, "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "Content-Type" } });
+      assert.equal(res.status, 204);
+      assert.equal(res.headers.get("access-control-allow-origin"), origin);
+      assert.equal(res.headers.get("access-control-allow-credentials"), "true");
+    }
+    for (const origin of ["https://evil.vercel.app", "https://atlanta-tennis-preview.vercel.app.evil.example"]) {
+      const res = await fetch(base + "/api/leagues", { method: "OPTIONS", headers: { Origin: origin, "Access-Control-Request-Method": "POST" } });
+      assert.equal(res.status, 403);
+      assert.equal(res.headers.get("access-control-allow-origin"), null);
+    }
+  } finally {
+    if (previous === undefined) delete process.env.VERCEL_URL;
+    else process.env.VERCEL_URL = previous;
+  }
+});

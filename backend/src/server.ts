@@ -44,8 +44,8 @@ app.use(protectOrigin);
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps/curl),
-      // any localhost port, or the production frontend
+      // Allow requests with no origin (like mobile apps/curl) and
+      // explicitly permitted frontend origins.
       callback(null, !origin || allowedOrigin(origin));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

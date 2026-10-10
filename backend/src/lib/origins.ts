@@ -4,12 +4,12 @@ export function allowedOrigin(origin: string, host?: string) {
   if (host && (origin === `https://${host}` || origin === `http://${host}`)) return true;
   const configured = [process.env.CLIENT_URL, ...(process.env.ALLOWED_ORIGINS || "").split(",")].filter(Boolean);
   if (configured.some(value => value!.trim().replace(/\/$/, "") === origin)) return true;
-  if (process.env.ALLOWED_ORIGIN_SUFFIXES) {
-    const suffixes = process.env.ALLOWED_ORIGIN_SUFFIXES.split(",").map(s => s.trim()).filter(Boolean);
-    if (suffixes.some(suffix => origin.endsWith(suffix))) return true;
-  }
+  // Vercel provides these exact URLs for this project's deployments.
+  const deploymentHosts = [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL].filter(Boolean);
+  if (deploymentHosts.some(hostname => origin === `https://${hostname}`)) return true;
   const isProduction = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
-  return !isProduction && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  if (!isProduction && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  return false;
 }
 // Origin checks complement authentication and prevent cookie-based CSRF.
 export const protectOrigin: RequestHandler = (req, res, next) => {

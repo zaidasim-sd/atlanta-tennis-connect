@@ -15,6 +15,7 @@ import { League } from "../models/League";
 import { Season } from "../models/Season";
 import { broadcastCapacityChange } from "../lib/events";
 import { wrap, ok, err } from "../lib/apiResponse";
+import { requireAuth, requireOrganizer } from "../lib/auth";
 
 const router = Router();
 
@@ -52,6 +53,8 @@ function leagueToFrontend(l: InstanceType<typeof League>) {
 // POST /api/leagues
 router.post(
   "/",
+  requireAuth,
+  requireOrganizer,
   wrap(async (req, res) => {
     const slug = req.body.id || `l-${Math.random().toString(36).slice(2, 9)}`;
     
@@ -78,7 +81,7 @@ router.post(
 
     await newLeague.save();
     
-    ok(res, leagueToFrontend(newLeague));
+    ok(res, leagueToFrontend(newLeague), 201);
   })
 );
 
