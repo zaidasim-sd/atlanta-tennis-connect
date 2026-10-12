@@ -47,7 +47,7 @@ interface ActiveReservation {
 
 function RegisterLeague() {
   const { leagueId } = Route.useParams();
-  const { user, hydrated, leagues, seasons, players, registrations, refreshFromDb, spotsLeft, searchPartners, registerPlayer } = useStore();
+  const { user, hydrated, leagues, seasons, players, registrations, refreshFromDb, spotsLeft, searchPartners } = useStore();
   const navigate = useNavigate();
 
   const league = leagues.find((l) => l.id === leagueId);
@@ -377,12 +377,6 @@ function RegisterLeague() {
       if (!res.ok || !json.ok) {
         const errMsg = json.error || "Could not reserve a spot.";
         if (errMsg.toLowerCase().includes("already registered")) {
-          registerPlayer({
-            leagueId: league.id,
-            player,
-            partnerId: partnerChoice === "have-partner" ? partnerId : undefined,
-            preferredCourt,
-          });
           completed.current = true;
           sessionStorage.removeItem(storageKey);
           setSuccess(true);
@@ -395,13 +389,7 @@ function RegisterLeague() {
         return;
       }
       const data = json.data;
-      if (data && (data.reservation?.status === "registered" || data.reservation?.paymentStatus === "paid")) {
-        registerPlayer({
-          leagueId: league.id,
-          player,
-          partnerId: partnerChoice === "have-partner" ? partnerId : undefined,
-          preferredCourt,
-        });
+      if (data?.reservation?.status === "registered") {
         completed.current = true;
         sessionStorage.removeItem(storageKey);
         setSuccess(true);
@@ -433,49 +421,23 @@ function RegisterLeague() {
   const handlePaymentSuccess = async () => {
     if (!reservation) return;
     try {
-      if (!reservation.clientSecret?.includes("mock")) {
-        const res = await fetch(getApiUrl(`/api/payments/${reservation.id}/reconcile`), {
-          method: "POST",
-          credentials: "include",
-        });
-        const json = await res.json();
-        if (!res.ok || !json.ok) throw new Error(json.error || "Verification pending.");
-      }
-    } catch (e) {
-      console.warn("Payment reconcile note:", e);
-    }
-
-    // Always ensure registration is confirmed on backend database API
-    try {
-      await fetch(getApiUrl("/api/registrations/confirm"), {
+      const res = await fetch(getApiUrl(`/api/payments/${reservation.id}/reconcile`), {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          leagueId: league.id,
-          playerEmail: user.email,
-          playerName: `${player.firstName} ${player.lastName}`.trim(),
-          ntrp: player.ntrp,
-          phone: player.phone,
-          preferredCourt,
-          amountCents: effectiveFeeCents,
-        }),
       });
+      const json = await res.json();
+      if (!res.ok || !json.ok || json.data?.status !== "registered")
+        throw new Error(json.error || "Payment verification is pending. Refresh to check your registration.");
+      await refreshFromDb();
+      completed.current = true;
+      sessionStorage.removeItem(storageKey);
+      setSuccess(true);
+      toast.success(`Payment of ${formatMoney(effectiveFeeCents)} confirmed. Your registration is complete.`);
     } catch (e) {
-      console.warn("Backend confirm registration fallback note:", e);
+      const message = e instanceof Error ? e.message : "Payment verification is pending.";
+      setApiError(message);
+      toast.error(message);
     }
-
-    registerPlayer({
-      leagueId: league.id,
-      player,
-      partnerId: partnerChoice === "have-partner" ? partnerId : undefined,
-      preferredCourt,
-    });
-    completed.current = true;
-    sessionStorage.removeItem(storageKey);
-    setSuccess(true);
-    await refreshFromDb();
-    toast.success(`Payment of ${formatMoney(effectiveFeeCents)} confirmed. Your registration is complete.`);
   };
 
   const handleCancelReservation = async () => {

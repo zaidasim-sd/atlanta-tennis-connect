@@ -59,6 +59,23 @@ beforeEach(async () => {
 });
 after(async () => { if (server) await new Promise(resolve => server.close(resolve)); await mongoose.disconnect(); if (db) await db.stop(); });
 const profile = email => ({ email, firstName: "Changed", lastName: "Name", phone: "changed", city: "Atlanta", ntrp: "3.5" });
+test("client confirmation cannot fabricate a paid registration", async () => {
+  const body = { leagueId: "l-sec", playerEmail: "a@example.test", amountCents: 1, status: "registered" };
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", body })).status, 401);
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", who: "b", body })).status, 403);
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", who: "a", body })).status, 404);
+  const id = await reserve();
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", who: "a", body })).status, 409);
+  const held = await Reservation.findById(id);
+  assert.equal(held.status, "payment_pending");
+  assert.equal(held.amountCents, 100);
+  assert.equal((await League.findOne({ slug: "l-sec" })).spotsRemaining, 2);
+  intents.get(held.paymentIntentId).status = "paid";
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", who: "a", body })).status, 200);
+  assert.equal((await Reservation.findById(id)).status, "registered");
+  assert.equal((await request("/api/registrations/confirm", { method: "POST", who: "a", body })).status, 200);
+  assert.equal(await AuditLog.countDocuments({ reservationId: id, action: "registration.confirmed" }), 1);
+});
 async function reserve(who = "a") {
   const r = await request("/api/registrations", { method: "POST", who, body: { leagueId: "l-sec", playerEmail: `${who}@example.test` } });
   assert.equal(r.status, 201); return r.body.data.reservation.id;
