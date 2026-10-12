@@ -1,0 +1,27 @@
+
+> atlanta-tennis-backend@1.0.0 test:unit
+> npm run build && node --test tests/zip-area-capacity.test.cjs tests/gender.test.cjs
+
+
+> atlanta-tennis-backend@1.0.0 build
+> tsc -p tsconfig.json
+
+▶ Gender Schema Additions
+  ✔ accepts valid gender values (6.9313ms)
+  ✔ accepts signup when gender is omitted (backward compatibility) (0.4752ms)
+  ✔ rejects unknown gender strings (1.8229ms)
+✔ Gender Schema Additions (11.6557ms)
+▶ Atlanta ZIP Codes and Metro Areas
+  ✔ defines exactly 53 approved Atlanta, Alpharetta, Cumming, and Marietta metro ZIP codes (1.8392ms)
+  ✔ defines 6 approved metro areas with Cumming (1.822ms)
+  ✔ validates ZIP codes strictly via Zod enum (2.7147ms)
+  ✔ enforces league capacity math invariant: registeredCount + spotsRemaining === playerLimit (0.2307ms)
+✔ Atlanta ZIP Codes and Metro Areas (9.2491ms)
+ℹ tests 7
+ℹ suites 2
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 224.0164

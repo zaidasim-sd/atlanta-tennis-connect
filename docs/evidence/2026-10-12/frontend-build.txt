@@ -1,0 +1,204 @@
+
+> build
+> npm run typecheck && vite build --mode production
+
+
+> typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.api.json
+
+[nitro:vercel] i Using nodejs24.x runtime.
+[nitro:vercel] i Using web entry format.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+vite v8.1.5 building client environment for production...
+[2K
+transforming...✓ 2022 modules transformed.
+rendering chunks...
+computing gzip size...
+.vercel/output/static/assets/styles-BSc0KZmB.css             128.66 kB │ gzip:  19.90 kB
+.vercel/output/static/assets/check-CGuLSgvJ.js                 0.11 kB │ gzip:   0.13 kB
+.vercel/output/static/assets/chevron-down-CVNS-mf0.js          0.11 kB │ gzip:   0.13 kB
+.vercel/output/static/assets/chevron-right-BYt5tOby.js         0.11 kB │ gzip:   0.13 kB
+.vercel/output/static/assets/x-DEOeizpg.js                     0.14 kB │ gzip:   0.14 kB
+.vercel/output/static/assets/arrow-left-B5GamzS0.js            0.15 kB │ gzip:   0.15 kB
+.vercel/output/static/assets/arrow-right-Bw-xM_tt.js           0.15 kB │ gzip:   0.15 kB
+.vercel/output/static/assets/clock-Be6JSj91.js                 0.15 kB │ gzip:   0.15 kB
+.vercel/output/static/assets/search-DKnRDEsz.js                0.16 kB │ gzip:   0.16 kB
+.vercel/output/static/assets/circle-check-DXqeXpyP.js          0.16 kB │ gzip:   0.16 kB
+.vercel/output/static/assets/user-BZBDFfAA.js                  0.18 kB │ gzip:   0.17 kB
+.vercel/output/static/assets/skeleton-DAI6wTHF.js              0.18 kB │ gzip:   0.17 kB
+.vercel/output/static/assets/lock-BnpL86a7.js                  0.19 kB │ gzip:   0.18 kB
+.vercel/output/static/assets/credit-card-CHl3uTdm.js           0.19 kB │ gzip:   0.17 kB
+.vercel/output/static/assets/eye-SrJfNiee.js                   0.24 kB │ gzip:   0.19 kB
+.vercel/output/static/assets/calendar--bEU7-EF.js              0.24 kB │ gzip:   0.19 kB
+.vercel/output/static/assets/map-pin-62DeeRyo.js               0.24 kB │ gzip:   0.21 kB
+.vercel/output/static/assets/users-C1msz5ah.js                 0.29 kB │ gzip:   0.21 kB
+.vercel/output/static/assets/shield-check-Bcp24ziw.js          0.30 kB │ gzip:   0.24 kB
+.vercel/output/static/assets/trophy-n4eIhwpw.js                0.46 kB │ gzip:   0.26 kB
+.vercel/output/static/assets/calendar-days-DvzS9C0V.js         0.48 kB │ gzip:   0.25 kB
+.vercel/output/static/assets/rolldown-runtime-CbXtAM7H.js      0.58 kB │ gzip:   0.36 kB
+.vercel/output/static/assets/eye-off-DXO97yeZ.js               0.61 kB │ gzip:   0.35 kB
+.vercel/output/static/assets/input-x-fgsO10.js                 0.62 kB │ gzip:   0.39 kB
+.vercel/output/static/assets/label-chdj1MMg.js                 0.69 kB │ gzip:   0.45 kB
+.vercel/output/static/assets/tennis-ball-BzQuVmLq.js           0.70 kB │ gzip:   0.44 kB
+.vercel/output/static/assets/dist-CL-xbadu.js                  0.71 kB │ gzip:   0.49 kB
+.vercel/output/static/assets/reveal-31LJ_QZh.js                0.75 kB │ gzip:   0.49 kB
+.vercel/output/static/assets/login-Bf5FZS0d.js                 0.80 kB │ gzip:   0.48 kB
+.vercel/output/static/assets/useParams-Dv97cbkI.js             0.83 kB │ gzip:   0.47 kB
+.vercel/output/static/assets/register._leagueId-BvbZB_Z1.js    1.03 kB │ gzip:   0.58 kB
+.vercel/output/static/assets/signup-BgPgDSe5.js                1.08 kB │ gzip:   0.61 kB
+.vercel/output/static/assets/how-it-works-BAlaVDa_.js          2.06 kB │ gzip:   1.03 kB
+.vercel/output/static/assets/dialog-CI6pFr93.js                2.11 kB │ gzip:   0.85 kB
+.vercel/output/static/assets/how-it-works-DfIbvUr-.js          2.71 kB │ gzip:   1.13 kB
+.vercel/output/static/assets/avatar-C7WSS7Ry.js                2.77 kB │ gzip:   1.26 kB
+.vercel/output/static/assets/zip-code-input-IDfh7_Ws.js        3.33 kB │ gzip:   1.54 kB
+.vercel/output/static/assets/react-dom-_CjURjHM.js             3.90 kB │ gzip:   1.42 kB
+.vercel/output/static/assets/league-card-BJo5vokH.js           4.67 kB │ gzip:   1.53 kB
+.vercel/output/static/assets/dist-BzprI2eZ.js                  4.83 kB │ gzip:   1.75 kB
+.vercel/output/static/assets/preload-helper-DetPo6va.js        5.03 kB │ gzip:   2.00 kB
+.vercel/output/static/assets/dist-D1C3TPKU.js                  7.24 kB │ gzip:   2.81 kB
+.vercel/output/static/assets/dist-Dn4DS8VH.js                  7.33 kB │ gzip:   2.67 kB
+.vercel/output/static/assets/profile-PmwCroa-.js               8.27 kB │ gzip:   2.46 kB
+.vercel/output/static/assets/leagues._leagueId-BT8X_D6G.js    10.09 kB │ gzip:   3.32 kB
+.vercel/output/static/assets/login-B32_PE9k.js                10.81 kB │ gzip:   3.37 kB
+.vercel/output/static/assets/link-BXIDrRA5.js                 11.26 kB │ gzip:   4.99 kB
+.vercel/output/static/assets/leagues.index-COjDTQL8.js        14.29 kB │ gzip:   4.46 kB
+.vercel/output/static/assets/routes-BNnFbyQK.js               15.96 kB │ gzip:   5.27 kB
+.vercel/output/static/assets/Combination-RuBrCpOM.js          22.77 kB │ gzip:   8.16 kB
+.vercel/output/static/assets/sheet-DAqqK7H6.js                25.17 kB │ gzip:   8.33 kB
+.vercel/output/static/assets/dist-RK8zBspk.js                 26.14 kB │ gzip:  10.11 kB
+.vercel/output/static/assets/signup-C2VYoYEV.js               27.75 kB │ gzip:   7.76 kB
+.vercel/output/static/assets/dist-DFr1_pKZ.js                 33.59 kB │ gzip:   9.37 kB
+.vercel/output/static/assets/dashboard-WPwOI2AK.js            33.60 kB │ gzip:   7.12 kB
+.vercel/output/static/assets/organizer-YHxidE08.js            45.13 kB │ gzip:  10.11 kB
+.vercel/output/static/assets/store-CWGAEYxa.js                54.08 kB │ gzip:  18.37 kB
+.vercel/output/static/assets/register._leagueId-B1CWr6iY.js   58.20 kB │ gzip:  15.27 kB
+.vercel/output/static/assets/index-DjqhHdQV.js               382.15 kB │ gzip: 119.08 kB
+
+[PLUGIN_TIMINGS] Your build spent significant time in plugins. Here is a breakdown:
+  - tanstack-start-core:import-protection (62%)
+  - vite-tsconfig-paths (28%)
+  - tanstack-start-core:import-protection-transform-cache (7%)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+
+✓ built in 9.62s
+vite v8.1.5 building ssr environment for production...
+[2K
+transforming...✓ 101 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/assets/styles-BSc0KZmB.css                     128.66 kB │ gzip: 19.90 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-BWw5xvMe.js         0.25 kB │ gzip:  0.17 kB
+node_modules/.nitro/vite/services/ssr/assets/skeleton-wjCDjunr.js                      0.33 kB │ gzip:  0.25 kB
+node_modules/.nitro/vite/services/ssr/assets/register._leagueId-Ry1-vD67.js            0.36 kB │ gzip:  0.22 kB
+node_modules/.nitro/vite/services/ssr/assets/login-BmA_Ywy4.js                         0.52 kB │ gzip:  0.29 kB
+node_modules/.nitro/vite/services/ssr/assets/signup-CwxeMelZ.js                        0.53 kB │ gzip:  0.30 kB
+node_modules/.nitro/vite/services/ssr/assets/label-BSp-vK0j.js                         0.64 kB │ gzip:  0.39 kB
+node_modules/.nitro/vite/services/ssr/assets/input-BnQqxFon.js                         0.76 kB │ gzip:  0.46 kB
+node_modules/.nitro/vite/services/ssr/assets/tennis-ball-C7AZ-Ogs.js                   1.09 kB │ gzip:  0.59 kB
+node_modules/.nitro/vite/services/ssr/assets/avatar-BLhu9J1l.js                        1.12 kB │ gzip:  0.44 kB
+node_modules/.nitro/vite/services/ssr/assets/reveal-DoKTMvfa.js                        1.17 kB │ gzip:  0.67 kB
+node_modules/.nitro/vite/services/ssr/assets/start-C8IUVvuH.js                         1.60 kB │ gzip:  0.73 kB
+node_modules/.nitro/vite/services/ssr/assets/how-it-works-CJJ6hQJ_.js                  1.75 kB │ gzip:  0.81 kB
+node_modules/.nitro/vite/services/ssr/assets/dialog-BlG48saO.js                        3.06 kB │ gzip:  0.99 kB
+node_modules/.nitro/vite/services/ssr/assets/createCsrfMiddleware-fY_2wR2S.js          3.25 kB │ gzip:  1.03 kB
+node_modules/.nitro/vite/services/ssr/assets/how-it-works-CJp8-uEx.js                  3.80 kB │ gzip:  1.30 kB
+node_modules/.nitro/vite/services/ssr/index.js                                         4.98 kB │ gzip:  2.07 kB
+node_modules/.nitro/vite/services/ssr/assets/zip-code-input-BUyRROeU.js                5.25 kB │ gzip:  1.93 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-CTEC9VWU.js    5.43 kB │ gzip:  1.27 kB
+node_modules/.nitro/vite/services/ssr/assets/league-card-4uWjudXc.js                   6.78 kB │ gzip:  1.88 kB
+node_modules/.nitro/vite/services/ssr/assets/sheet-swS2jKOT.js                         8.07 kB │ gzip:  2.03 kB
+node_modules/.nitro/vite/services/ssr/assets/profile-_o8c52HN.js                      12.13 kB │ gzip:  3.00 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-BN3X6qyh.js                       13.80 kB │ gzip:  3.75 kB
+node_modules/.nitro/vite/services/ssr/assets/leagues._leagueId-BojeQFp-.js            13.98 kB │ gzip:  3.85 kB
+node_modules/.nitro/vite/services/ssr/assets/login-CQolOj7k.js                        16.15 kB │ gzip:  4.12 kB
+node_modules/.nitro/vite/services/ssr/assets/leagues.index-_N56LOA7.js                21.51 kB │ gzip:  5.36 kB
+node_modules/.nitro/vite/services/ssr/assets/store-CFOG9JiZ.js                        22.38 kB │ gzip:  6.54 kB
+node_modules/.nitro/vite/services/ssr/assets/signup-CzQ7zGV6.js                       35.47 kB │ gzip:  7.93 kB
+node_modules/.nitro/vite/services/ssr/assets/router-4jhn-6Y9.js                       36.20 kB │ gzip:  7.66 kB
+node_modules/.nitro/vite/services/ssr/assets/dashboard-BWuHO7Y1.js                    50.44 kB │ gzip:  8.56 kB
+node_modules/.nitro/vite/services/ssr/assets/server-jAhF6f93.js                       66.86 kB │ gzip: 16.98 kB
+node_modules/.nitro/vite/services/ssr/assets/register._leagueId-8SljwiT9.js           68.55 kB │ gzip: 12.92 kB
+node_modules/.nitro/vite/services/ssr/assets/organizer-CRpuJ4NX.js                    72.77 kB │ gzip: 12.88 kB
+
+✓ built in 1.73s
+[nitro] o Building [Nitro] (preset: vercel, compatibility: 2026-10-12)
+[nitro] √ Generated public .vercel/output/static
+vite v8.1.5 building nitro environment for production...
+[2K
+transforming...✓ 2050 modules transformed.
+i Tracing dependencies:
+- tslib (2.8.1)
+√ Traced 1 dependencies (4 files) in 62ms.
+i Ensure your production environment matches the builder OS and architecture (win32-x64) to avoid native module issues.
+rendering chunks...
+computing gzip size...
+.vercel/output/functions/__server.func/_ssr/empty-plugin-adapters-BWw5xvMe.mjs          0.25 kB │ gzip:   0.18 kB
+.vercel/output/functions/__server.func/_libs/radix-ui__number.mjs                       0.35 kB │ gzip:   0.26 kB
+.vercel/output/functions/__server.func/_ssr/register._leagueId-Ry1-vD67.mjs             0.46 kB │ gzip:   0.29 kB
+.vercel/output/functions/__server.func/_ssr/skeleton-wjCDjunr.mjs                       0.52 kB │ gzip:   0.35 kB
+.vercel/output/functions/__server.func/_ssr/login-BmA_Ywy4.mjs                          0.62 kB │ gzip:   0.36 kB
+.vercel/output/functions/__server.func/_ssr/signup-CwxeMelZ.mjs                         0.62 kB │ gzip:   0.36 kB
+.vercel/output/functions/__server.func/_chunks/ssr-renderer.mjs                         0.65 kB │ gzip:   0.38 kB
+.vercel/output/functions/__server.func/_libs/tanstack__react-query.mjs                  0.81 kB │ gzip:   0.40 kB
+.vercel/output/functions/__server.func/_ssr/label-BSp-vK0j.mjs                          0.98 kB │ gzip:   0.50 kB
+.vercel/output/functions/__server.func/_libs/radix-ui__react-label.mjs                  1.03 kB │ gzip:   0.53 kB
+.vercel/output/functions/__server.func/_ssr/input-BnQqxFon.mjs                          1.10 kB │ gzip:   0.59 kB
+.vercel/output/functions/__server.func/_runtime.mjs                                     1.31 kB │ gzip:   0.65 kB
+.vercel/output/functions/__server.func/_ssr/tennis-ball-C7AZ-Ogs.mjs                    1.39 kB │ gzip:   0.68 kB
+.vercel/output/functions/__server.func/_ssr/avatar-BLhu9J1l.mjs                         1.52 kB │ gzip:   0.57 kB
+.vercel/output/functions/__server.func/_ssr/reveal-DoKTMvfa.mjs                         1.52 kB │ gzip:   0.80 kB
+.vercel/output/functions/__server.func/_ssr/start-C8IUVvuH.mjs                          1.56 kB │ gzip:   0.72 kB
+.vercel/output/functions/__server.func/_libs/radix-ui__primitive.mjs                    1.85 kB │ gzip:   0.73 kB
+.vercel/output/functions/__server.func/_ssr/how-it-works-CJJ6hQJ_.mjs                   1.88 kB │ gzip:   0.88 kB
+.vercel/output/functions/__server.func/_ssr/createCsrfMiddleware-fY_2wR2S.mjs           3.13 kB │ gzip:   1.03 kB
+.vercel/output/functions/__server.func/_libs/class-variance-authority+clsx.mjs          3.22 kB │ gzip:   1.26 kB
+.vercel/output/functions/__server.func/_ssr/dialog-BlG48saO.mjs                         3.72 kB │ gzip:   1.15 kB
+.vercel/output/functions/__server.func/_ssr/how-it-works-CJp8-uEx.mjs                   4.73 kB │ gzip:   1.45 kB
+.vercel/output/functions/__server.func/_ssr/ssr.mjs                                     4.94 kB │ gzip:   2.08 kB
+.vercel/output/functions/__server.func/_libs/stripe__stripe-js.mjs                      5.46 kB │ gzip:   1.90 kB
+.vercel/output/functions/__server.func/_libs/@radix-ui/react-avatar+[...].mjs           5.48 kB │ gzip:   1.57 kB
+.vercel/output/functions/__server.func/_tanstack-start-manifest_v-CTEC9VWU.mjs          5.51 kB │ gzip:   1.31 kB
+.vercel/output/functions/__server.func/_ssr/zip-code-input-BUyRROeU.mjs                 6.01 kB │ gzip:   2.08 kB
+.vercel/output/functions/__server.func/index.mjs                                        7.38 kB │ gzip:   2.61 kB
+.vercel/output/functions/__server.func/_ssr/league-card-4uWjudXc.mjs                    8.07 kB │ gzip:   2.00 kB
+.vercel/output/functions/__server.func/_ssr/sheet-swS2jKOT.mjs                          9.33 kB │ gzip:   2.30 kB
+.vercel/output/functions/__server.func/_libs/radix-ui__react-popover.mjs                9.74 kB │ gzip:   2.40 kB
+.vercel/output/functions/__server.func/_libs/tanstack__history.mjs                     12.53 kB │ gzip:   3.72 kB
+.vercel/output/functions/__server.func/_ssr/profile-_o8c52HN.mjs                       14.07 kB │ gzip:   3.18 kB
+.vercel/output/functions/__server.func/_ssr/routes-BN3X6qyh.mjs                        15.74 kB │ gzip:   3.89 kB
+.vercel/output/functions/__server.func/_ssr/leagues._leagueId-BojeQFp-.mjs             16.15 kB │ gzip:   4.02 kB
+.vercel/output/functions/__server.func/_libs/h3-v2+rou3+srvx.mjs                       18.31 kB │ gzip:   5.00 kB
+.vercel/output/functions/__server.func/_ssr/login-CQolOj7k.mjs                         18.57 kB │ gzip:   4.31 kB
+.vercel/output/functions/__server.func/_ssr/store-CFOG9JiZ.mjs                         22.66 kB │ gzip:   6.65 kB
+.vercel/output/functions/__server.func/_libs/lucide-react.mjs                          23.24 kB │ gzip:   4.35 kB
+.vercel/output/functions/__server.func/_libs/@stripe/react-stripe-js+[...].mjs         23.67 kB │ gzip:   6.39 kB
+.vercel/output/functions/__server.func/_ssr/leagues.index-_N56LOA7.mjs                 24.58 kB │ gzip:   5.56 kB
+.vercel/output/functions/__server.func/_libs/@floating-ui/dom+[...].mjs                25.43 kB │ gzip:   6.59 kB
+.vercel/output/functions/__server.func/_libs/@floating-ui/core+[...].mjs               25.60 kB │ gzip:   6.34 kB
+.vercel/output/functions/__server.func/_libs/h3+rou3+srvx.mjs                          27.33 kB │ gzip:   7.17 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/router-core+[...].mjs           29.99 kB │ gzip:   8.01 kB
+.vercel/output/functions/__server.func/_libs/@floating-ui/react-dom+[...].mjs          32.75 kB │ gzip:   8.26 kB
+.vercel/output/functions/__server.func/_ssr/signup-CzQ7zGV6.mjs                        39.65 kB │ gzip:   8.15 kB
+.vercel/output/functions/__server.func/_ssr/router-4jhn-6Y9.mjs                        40.02 kB │ gzip:   7.92 kB
+.vercel/output/functions/__server.func/_libs/@radix-ui/react-select+[...].mjs          45.98 kB │ gzip:   9.73 kB
+.vercel/output/functions/__server.func/_libs/tanstack__query-core.mjs                  50.23 kB │ gzip:  11.14 kB
+.vercel/output/functions/__server.func/_libs/sonner.mjs                                53.61 kB │ gzip:  12.13 kB
+.vercel/output/functions/__server.func/_libs/@radix-ui/react-accordion+[...].mjs       56.91 kB │ gzip:  11.87 kB
+.vercel/output/functions/__server.func/_ssr/dashboard-BWuHO7Y1.mjs                     57.75 kB │ gzip:   8.89 kB
+.vercel/output/functions/__server.func/_libs/@radix-ui/react-dropdown-menu+[...].mjs   59.37 kB │ gzip:  11.69 kB
+.vercel/output/functions/__server.func/_libs/@radix-ui/react-dialog+[...].mjs          63.62 kB │ gzip:  14.84 kB
+.vercel/output/functions/__server.func/_ssr/server-jAhF6f93.mjs                        64.73 kB │ gzip:  16.82 kB
+.vercel/output/functions/__server.func/_ssr/register._leagueId-8SljwiT9.mjs            77.76 kB │ gzip:  13.33 kB
+.vercel/output/functions/__server.func/_ssr/organizer-CRpuJ4NX.mjs                     82.44 kB │ gzip:  13.28 kB
+.vercel/output/functions/__server.func/_libs/tailwind-merge.mjs                        88.16 kB │ gzip:  15.68 kB
+.vercel/output/functions/__server.func/_libs/@tanstack/react-router+[...].mjs         789.82 kB │ gzip: 165.55 kB
+
+[PLUGIN_TIMINGS] Your build spent significant time in plugins. Here is a breakdown:
+  - vite-tsconfig-paths (69%)
+  - replace (30%)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+
+✓ built in 3.55s
+i Generated .vercel/output/nitro.json
+[nitro] √ You can preview this build using npx vite preview
+[nitro] √ You can deploy this build using npx nitro deploy --prebuilt

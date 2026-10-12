@@ -1,0 +1,133 @@
+
+> atlanta-tennis-backend@1.0.0 test
+> npm run build && node --test tests/reservations.test.cjs tests/auth.test.cjs
+
+
+> atlanta-tennis-backend@1.0.0 build
+> tsc -p tsconfig.json
+
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/confirm path=/api/registrations/confirm origin=https://staging.example.test
+✔ client confirmation cannot fabricate a paid registration (2738.2593ms)
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=https://staging.example.test
+[DEBUG] GET url=/api/registrations?email=a@example.test path=/api/registrations origin=https://staging.example.test
+[DEBUG] POST url=/api/players path=/api/players origin=https://staging.example.test
+✔ anonymous profile reads/writes and reservation lookups require login (72.959ms)
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=https://staging.example.test
+[DEBUG] GET url=/api/players/b@example.test path=/api/players/b@example.test origin=https://staging.example.test
+[DEBUG] POST url=/api/players path=/api/players origin=https://staging.example.test
+[DEBUG] POST url=/api/players path=/api/players origin=https://staging.example.test
+✔ player can read/update self but cannot read/upsert another profile (117.3018ms)
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] GET url=/api/registrations?email=a@example.test path=/api/registrations origin=https://staging.example.test
+[DEBUG] GET url=/api/registrations?email=a@example.test path=/api/registrations origin=https://staging.example.test
+✔ registration identity comes from session; cross-player creation/list rejected (127.6015ms)
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] GET url=/api/payments/status/6acc6633a78cf7c697d52d12 path=/api/payments/status/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+[DEBUG] GET url=/api/payments/status/6acc6633a78cf7c697d52d12 path=/api/payments/status/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/checkout path=/api/payments/6acc6633a78cf7c697d52d12/checkout origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/checkout path=/api/payments/6acc6633a78cf7c697d52d12/checkout origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/reconcile path=/api/payments/6acc6633a78cf7c697d52d12/reconcile origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/reconcile path=/api/payments/6acc6633a78cf7c697d52d12/reconcile origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/reconcile/6acc6633a78cf7c697d52d12 path=/api/payments/reconcile/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/reconcile/6acc6633a78cf7c697d52d12 path=/api/payments/reconcile/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/cancel path=/api/payments/6acc6633a78cf7c697d52d12/cancel origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d12/cancel path=/api/payments/6acc6633a78cf7c697d52d12/cancel origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/cancel/6acc6633a78cf7c697d52d12 path=/api/payments/cancel/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/cancel/6acc6633a78cf7c697d52d12 path=/api/payments/cancel/6acc6633a78cf7c697d52d12 origin=https://staging.example.test
+✔ all payment routes and aliases reject anonymous and cross-player requests without side effects (149.8007ms)
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d50/checkout path=/api/payments/6acc6633a78cf7c697d52d50/checkout origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d50/reconcile path=/api/payments/6acc6633a78cf7c697d52d50/reconcile origin=https://staging.example.test
+[DEBUG] GET url=/api/payments/status/6acc6633a78cf7c697d52d50 path=/api/payments/status/6acc6633a78cf7c697d52d50 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d50/cancel path=/api/payments/6acc6633a78cf7c697d52d50/cancel origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6633a78cf7c697d52d50/cancel path=/api/payments/6acc6633a78cf7c697d52d50/cancel origin=https://staging.example.test
+✔ owner can resume, reconcile, poll and cancel; place is released only once (183.374ms)
+[DEBUG] POST url=/api/registrations/admin path=/api/registrations/admin origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/admin path=/api/registrations/admin origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/admin path=/api/registrations/admin origin=https://staging.example.test
+✔ shared admin key and forged role cannot grant organiser access (377.2213ms)
+[DEBUG] POST url=/api/registrations path=/api/registrations origin=https://staging.example.test
+[DEBUG] GET url=/api/payments/status/6acc6634a78cf7c697d52dc8 path=/api/payments/status/6acc6634a78cf7c697d52dc8 origin=https://staging.example.test
+[DEBUG] POST url=/api/payments/6acc6634a78cf7c697d52dc8/cancel path=/api/payments/6acc6634a78cf7c697d52dc8/cancel origin=https://staging.example.test
+✔ organiser can inspect and cancel a reservation (514.0807ms)
+[DEBUG] POST url=/api/auth/signup path=/api/auth/signup origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/signup path=/api/auth/signup origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/signup path=/api/auth/signup origin=https://staging.example.test
+✔ signup hashes passwords, uses secure opaque cookies, cannot claim seeded player or choose role (422.2132ms)
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/logout path=/api/auth/logout origin=https://staging.example.test
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+✔ login validates password; logout revokes cookie; expired sessions fail before TTL cleanup (734.204ms)
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+✔ public demo credentials cannot create an organizer account (386.2781ms)
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+[DEBUG] POST url=/api/registrations/admin path=/api/registrations/admin origin=https://staging.example.test
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+✔ tampered sessions, disabled accounts and role revocation take effect immediately (67.7545ms)
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=https://evil.example
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=https://evil.vercel.app
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=null
+[DEBUG] GET url=/api/players/a@example.test path=/api/players/a@example.test origin=http://localhost:5173
+[DEBUG] POST url=/api/auth/logout path=/api/auth/logout origin=none
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://other.example.test
+✔ CORS rejects arbitrary origins including unrelated Vercel apps; CSRF mutations require Origin (64.7972ms)
+[DEBUG] POST url=/api/payments/webhook path=/api/payments/webhook origin=none
+✔ webhook remains independent of user sessions and rejects unsigned events (52.7938ms)
+[DEBUG] GET url=/api/auth/me path=/api/auth/me origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+[DEBUG] POST url=/api/auth/login path=/api/auth/login origin=https://staging.example.test
+✔ private responses are not cacheable and login rate limiting persists in MongoDB (3755.148ms)
+[DEBUG] POST url=/api/leagues path=/api/leagues origin=https://staging.example.test
+[DEBUG] POST url=/api/leagues path=/api/leagues origin=https://staging.example.test
+[DEBUG] POST url=/api/leagues path=/api/leagues origin=https://staging.example.test
+✔ league creation requires an organiser session and returns 201 (94.1593ms)
+[DEBUG] OPTIONS url=/api/leagues path=/api/leagues origin=https://atlanta-tennis-preview.vercel.app
+[DEBUG] OPTIONS url=/api/leagues path=/api/leagues origin=https://staging.example.test
+[DEBUG] OPTIONS url=/api/leagues path=/api/leagues origin=https://evil.vercel.app
+[DEBUG] OPTIONS url=/api/leagues path=/api/leagues origin=https://atlanta-tennis-preview.vercel.app.evil.example
+✔ CORS preflights allow only exact project deployment URLs (61.4101ms)
+✔ 20 simultaneous players compete for the final slot: exactly one hold (2142.9216ms)
+✔ retry returns same reservation and intent without extending 15-minute hold (58.2424ms)
+✔ simultaneous cancellation and webhook replays release capacity only once (225.0794ms)
+✔ expiry cancels the payable Stripe intent before freeing slot (92.0198ms)
+✔ provider outage never frees a still-payable slot (59.6818ms)
+✔ payment wins cancellation race: registered and capacity stays consumed (60.9441ms)
+[expiry-job] Retaining reservation 6acc6632d00922948be8e7f4 for retry Payment is processing or could not be cancelled. Your spot remains held; please retry.
+✔ delayed success webhook after TTL still confirms paid held slot (73.3608ms)
+✔ declined attempt retains slot; stale failure webhook cannot undo success (68.329ms)
+✔ reconciliation of cancelled reservation cannot repeatedly release or revive it (90.8281ms)
+✔ transaction rolls back capacity on partner validation failure (34.7925ms)
+✔ doubles rejects partner with mismatched rating or organizer (78.125ms)
+✔ creation timeout recovers original intent and held slot on retry (93.2608ms)
+✔ amount mismatch cannot mark registration paid (43.6421ms)
+✔ Stripe webhook rejects unsigned or invalid signatures (250.6881ms)
+✔ authorization inside the 15-minute deadline is captured and registered (64.0582ms)
+✔ authorization after the deadline is cancelled, never charged, even without cron (65.078ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12240.5715

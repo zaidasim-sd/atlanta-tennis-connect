@@ -1,0 +1,86 @@
+{
+  "startedAt": "2026-10-12T04:48:01.495Z",
+  "environment": "https://atlanta-tennis-staging.vercel.app",
+  "provider": "stripe",
+  "livemode": false,
+  "leagueId": "qa-gap-validation-20261012",
+  "cases": [
+    {
+      "name": "insufficient-funds",
+      "startedAt": "2026-10-12T04:48:02.676Z",
+      "signupStatus": 201,
+      "reservationHttpStatus": 201,
+      "reservationId": "6acc6685c24f1b1cf9bfd160",
+      "paymentIntentId": "pi_3UPb9d3LwR6lzVYP0z5Z3uJP",
+      "spotsHeld": 1,
+      "errorCode": "card_declined",
+      "declineCode": "insufficient_funds",
+      "stripeStatus": "requires_payment_method",
+      "livemode": false,
+      "events": [
+        {
+          "id": "evt_3UPb9d3LwR6lzVYP0UNBN8fm",
+          "type": "payment_intent.payment_failed",
+          "created": 1791780488,
+          "pending_webhooks": 2,
+          "livemode": false
+        }
+      ],
+      "applicationStatus": "payment_pending",
+      "paymentStatus": "pending",
+      "spotsAfterDecline": 1,
+      "assertions": {
+        "declineMatches": true,
+        "testMode": true,
+        "notRegistered": true,
+        "paymentNotPaid": true,
+        "slotRetained": true,
+        "providerEventExists": true
+      },
+      "cleanupHttpStatus": 200,
+      "cleanupReleased": true,
+      "spotsAfterCleanup": 2
+    },
+    {
+      "name": "fraudulent",
+      "startedAt": "2026-10-12T04:48:21.379Z",
+      "signupStatus": 201,
+      "reservationHttpStatus": 201,
+      "reservationId": "6acc6697c24f1b1cf9bfd163",
+      "paymentIntentId": "pi_3UPb9w3LwR6lzVYP1KMSLRaQ",
+      "spotsHeld": 1,
+      "errorCode": "card_declined",
+      "declineCode": "fraudulent",
+      "stripeStatus": "requires_payment_method",
+      "livemode": false,
+      "events": [
+        {
+          "id": "evt_3UPb9w3LwR6lzVYP1OWMQ08i",
+          "type": "payment_intent.payment_failed",
+          "created": 1791780506,
+          "pending_webhooks": 2,
+          "livemode": false
+        }
+      ],
+      "applicationStatus": "payment_pending",
+      "paymentStatus": "pending",
+      "spotsAfterDecline": 1,
+      "assertions": {
+        "declineMatches": true,
+        "testMode": true,
+        "notRegistered": true,
+        "paymentNotPaid": true,
+        "slotRetained": true,
+        "providerEventExists": true
+      },
+      "cleanupHttpStatus": 200,
+      "cleanupReleased": true,
+      "spotsAfterCleanup": 2
+    }
+  ],
+  "spotsBefore": 2,
+  "spotsAfter": 2,
+  "capacityRestored": true,
+  "completedAt": "2026-10-12T04:48:36.020Z",
+  "passed": true
+}

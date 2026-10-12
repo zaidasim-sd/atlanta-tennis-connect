@@ -1,0 +1,126 @@
+{
+  "startedAt": "2026-10-12T04:51:18.668Z",
+  "environment": "https://atlanta-tennis-staging.vercel.app",
+  "provider": "stripe",
+  "livemode": false,
+  "leagueId": "qa-gap-validation-20261012",
+  "cases": [
+    {
+      "name": "insufficient-funds",
+      "startedAt": "2026-10-12T04:51:19.923Z",
+      "signupStatus": 201,
+      "reservationHttpStatus": 201,
+      "reservationId": "6acc674ac24f1b1cf9bfd166",
+      "paymentIntentId": "pi_3UPbCp3LwR6lzVYP0ykHrxzu",
+      "retries": [
+        {
+          "httpStatus": 201,
+          "reservationId": "6acc674ac24f1b1cf9bfd166",
+          "paymentIntentId": "pi_3UPbCp3LwR6lzVYP0ykHrxzu",
+          "expiresAt": "2026-10-12T05:06:22.440Z"
+        },
+        {
+          "httpStatus": 201,
+          "reservationId": "6acc674ac24f1b1cf9bfd166",
+          "paymentIntentId": "pi_3UPbCp3LwR6lzVYP0ykHrxzu",
+          "expiresAt": "2026-10-12T05:06:22.440Z"
+        }
+      ],
+      "retryAssertions": {
+        "sameReservation": true,
+        "sameIntent": true,
+        "holdNotExtended": true
+      },
+      "refreshFoundOriginal": true,
+      "spotsHeld": 1,
+      "errorCode": "card_declined",
+      "declineCode": "insufficient_funds",
+      "stripeStatus": "requires_payment_method",
+      "livemode": false,
+      "events": [
+        {
+          "id": "evt_3UPbCp3LwR6lzVYP0tclIii3",
+          "type": "payment_intent.payment_failed",
+          "created": 1791780688,
+          "pending_webhooks": 2,
+          "livemode": false
+        }
+      ],
+      "applicationStatus": "payment_pending",
+      "paymentStatus": "pending",
+      "spotsAfterDecline": 1,
+      "assertions": {
+        "declineMatches": true,
+        "testMode": true,
+        "notRegistered": true,
+        "paymentNotPaid": true,
+        "slotRetained": true,
+        "providerEventExists": true
+      },
+      "cleanupHttpStatus": 200,
+      "cleanupReleased": true,
+      "spotsAfterCleanup": 2
+    },
+    {
+      "name": "fraudulent",
+      "startedAt": "2026-10-12T04:51:36.772Z",
+      "signupStatus": 201,
+      "reservationHttpStatus": 201,
+      "reservationId": "6acc675bc24f1b1cf9bfd169",
+      "paymentIntentId": "pi_3UPbD53LwR6lzVYP0itmeOqy",
+      "retries": [
+        {
+          "httpStatus": 201,
+          "reservationId": "6acc675bc24f1b1cf9bfd169",
+          "paymentIntentId": "pi_3UPbD53LwR6lzVYP0itmeOqy",
+          "expiresAt": "2026-10-12T05:06:39.081Z"
+        },
+        {
+          "httpStatus": 201,
+          "reservationId": "6acc675bc24f1b1cf9bfd169",
+          "paymentIntentId": "pi_3UPbD53LwR6lzVYP0itmeOqy",
+          "expiresAt": "2026-10-12T05:06:39.081Z"
+        }
+      ],
+      "retryAssertions": {
+        "sameReservation": true,
+        "sameIntent": true,
+        "holdNotExtended": true
+      },
+      "refreshFoundOriginal": true,
+      "spotsHeld": 1,
+      "errorCode": "card_declined",
+      "declineCode": "fraudulent",
+      "stripeStatus": "requires_payment_method",
+      "livemode": false,
+      "events": [
+        {
+          "id": "evt_3UPbD53LwR6lzVYP0ZLXhI3E",
+          "type": "payment_intent.payment_failed",
+          "created": 1791780704,
+          "pending_webhooks": 2,
+          "livemode": false
+        }
+      ],
+      "applicationStatus": "payment_pending",
+      "paymentStatus": "pending",
+      "spotsAfterDecline": 1,
+      "assertions": {
+        "declineMatches": true,
+        "testMode": true,
+        "notRegistered": true,
+        "paymentNotPaid": true,
+        "slotRetained": true,
+        "providerEventExists": true
+      },
+      "cleanupHttpStatus": 200,
+      "cleanupReleased": true,
+      "spotsAfterCleanup": 2
+    }
+  ],
+  "spotsBefore": 2,
+  "spotsAfter": 2,
+  "capacityRestored": true,
+  "completedAt": "2026-10-12T04:51:54.114Z",
+  "passed": true
+}
