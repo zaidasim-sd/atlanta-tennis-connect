@@ -181,3 +181,11 @@ rotate any existing public demo credentials before a public release.
 Run `npm test --prefix backend` to validate authentication and reservation
 behavior against an isolated temporary MongoDB database. Its first run downloads
 a MongoDB test binary. These tests do not modify the configured application database.
+## Environment Setup
+1. Copy the example environment files:
+   ```bash
+   cp .env.example .env
+   cp backend/.env.example backend/.env
+   ```
+2. Populate the `.env` files with your actual local configuration values.
+3. **NEVER commit `.env`** or any files containing credentials to version control.
