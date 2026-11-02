@@ -63,7 +63,7 @@ export interface WebhookEventResult {
  * Core interface every payment adapter must implement.
  */
 export interface PaymentProvider {
-  readonly name: "stripe" | "mock" | "worldpay";
+  readonly name: "stripe" | "mock" | "worldpay" | "ezpaydirect";
 
   /** Initiate a payment. Idempotent on reservationId. */
   createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult>;

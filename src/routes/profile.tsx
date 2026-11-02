@@ -117,9 +117,6 @@ function Profile() {
               Manage your identity, preferred home court, and declared tennis rating.
             </p>
           </div>
-          <div className="rounded font-mono text-[11px] text-muted-foreground bg-muted/60 px-2.5 py-1 border border-border/40">
-            Player ID: {player.id}
-          </div>
         </div>
       </div>
 

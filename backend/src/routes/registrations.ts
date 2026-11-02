@@ -50,10 +50,15 @@ router.post(
     const { leagueId, playerEmail, partnerEmail } = parsed.data;
     if (!ownsEmail(req, playerEmail)) return err(res, "You can only register your own account", 403);
 
-    const publishableKey = (process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase() === "stripe"
-      ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY : undefined;
+    const paymentProvider = (process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase();
+    const publishableKey = paymentProvider === "stripe"
+      ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY
+      : paymentProvider === "ezpaydirect" ? process.env.EZPAYDIRECT_PUBLISHABLE_KEY : undefined;
     if ((process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase() === "stripe" && !publishableKey?.startsWith("pk_")) {
       return err(res, "Stripe checkout is not configured. Please contact the organizer.", 503);
+    }
+    if (paymentProvider === "ezpaydirect" && !publishableKey?.startsWith("epd_test_pk_")) {
+      return err(res, "Easy Pay Direct sandbox checkout is not configured. Please contact the organizer.", 503);
     }
 
     const result = await createReservation({

@@ -6,8 +6,11 @@ import { Reservation, type IReservation, type ReservationStatus } from "../model
 import { TournamentHistory } from "../models/TournamentHistory";
 import { AuditLog, type AuditAction } from "../models/AuditLog";
 import { getPaymentProvider } from "../payment";
+import { EzPayDirectProvider } from "../payment/ezPayDirectProvider";
 import { expireReservations } from "../jobs/expireReservations";
 import { broadcastCapacityChange } from "./events";
+import { RegistrationEmail } from "../models/RegistrationEmail";
+import { queueRegistrationEmails, deliverRegistrationEmails } from "./registrationEmail";
 
 const PENDING: ReservationStatus[] = ["held", "payment_pending"];
 const ACTIVE: ReservationStatus[] = [...PENDING, "paid", "registered"];
@@ -23,7 +26,7 @@ export interface ReservationDTO {
   amountCents: number;
   paymentIntentId?: string;
   clientSecret?: string;
-  paymentProvider: "stripe" | "mock" | "worldpay";
+  paymentProvider: "stripe" | "mock" | "worldpay" | "ezpaydirect";
   status: ReservationStatus;
   expiresAt: string;
   flaggedForReview?: boolean;
@@ -82,6 +85,7 @@ export async function createReservation(
 ): Promise<{ reservation: ReservationDTO; clientSecret?: string; checkoutUrl?: string }> {
   const provider = getPaymentProvider(); // Validate configuration before taking capacity.
   await Reservation.init(); // Ensure the active-registration unique index exists.
+  await RegistrationEmail.init();
   await expireReservations();
   const email = input.playerEmail.trim().toLowerCase();
   let reservation = await Reservation.findOne({
@@ -232,6 +236,7 @@ async function transition(
   status: "registered" | "cancelled" | "expired" | "failed" | "refunded" | "disputed",
   eventId?: string,
 ): Promise<boolean> {
+  if (status === "registered") await RegistrationEmail.init();
   let changed = false;
   await mongoose.connection.transaction(async (session) => {
     changed = false;
@@ -250,6 +255,7 @@ async function transition(
       { new: true, session },
     );
     if (!updated) return;
+    if (status === "registered") await queueRegistrationEmails(updated, session);
     if (["cancelled", "expired", "failed"].includes(status)) {
       await League.updateOne({ slug: r.leagueSlug }, { $inc: { spotsRemaining: 1 } }, { session });
     }
@@ -283,6 +289,12 @@ async function transition(
       reservationId: r._id.toString(),
       status,
     });
+    if (status === "registered") {
+      // Delivery failure must not undo a verified payment or confirmed place.
+      // The committed outbox is retried by the local worker and cron.
+      try { await deliverRegistrationEmails(r._id.toString()); }
+      catch { console.error("[registration-email] Delivery deferred to background retry"); }
+    }
   }
   return changed;
 }
@@ -331,7 +343,7 @@ export async function confirmPayment(
     await transition(r, "cancelled", webhookEventId);
   } else if (result.status === "failed" && r.paymentProvider === "mock") {
     await transition(r, "failed", webhookEventId);
-  } else if (result.status === "failed" && r.paymentProvider === "worldpay") {
+  } else if (result.status === "failed" && (r.paymentProvider === "worldpay" || r.paymentProvider === "ezpaydirect")) {
     // Close the retryable hosted session before releasing a declined payment's spot.
     await cancelReservation(r.id, "failed");
   }
@@ -353,6 +365,12 @@ export async function cancelReservation(
   if (!PENDING.includes(r.status)) return { released: true };
   const provider = getPaymentProvider();
   if (r.paymentProvider !== provider.name) throw error("Reservation uses a different payment provider", 409);
+  // EPD has not created an order until its Elements token is submitted, so there is
+  // nothing external to cancel. Releasing this pre-charge hold is safe.
+  if (provider.name === "ezpaydirect" && r.paymentIntentId?.startsWith("epd_pending_")) {
+    await transition(r, reason);
+    return { released: true };
+  }
   // Recover ambiguous creation failures before releasing. Never release a slot
   // while an associated payment can still succeed.
   if (!r.paymentIntentId) await ensurePayment(r);
@@ -390,6 +408,44 @@ export async function resumeCheckout(id: string) {
   const r = await findReservation(id);
   const payment = await ensurePayment(r);
   return { reservation, clientSecret: payment.clientSecret, checkoutUrl: payment.checkoutUrl };
+}
+
+function normaliseE164(phone: string): string | null {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length >= 8 && digits.length <= 15) return `+${digits}`;
+  return null;
+}
+
+/** Charges an EPD Elements token. The raw card number never reaches this server. */
+export async function completeEzPayDirectPayment(reservationId: string, cardToken: string): Promise<ReservationDTO> {
+  const r = await findReservation(reservationId);
+  if (!PENDING.includes(r.status)) return toDTO(r);
+  const provider = getPaymentProvider();
+  if (!(provider instanceof EzPayDirectProvider) || r.paymentProvider !== "ezpaydirect")
+    throw error("Easy Pay Direct is not selected for this reservation", 409);
+  if (!r.paymentIntentId) await ensurePayment(r);
+  const fresh = await findReservation(reservationId);
+  if (!fresh.paymentIntentId?.startsWith("epd_pending_")) return reconcileReservation(reservationId);
+
+  const player = await Player.findOne({ slug: fresh.playerSlug });
+  const phone = normaliseE164(player?.phone ?? "");
+  if (!player || !phone) throw error("Add a valid phone number to your profile before paying", 400);
+  const result = await provider.chargeCardToken({
+    reservationId: fresh._id.toString(), amountCents: fresh.amountCents, currency: "usd",
+    description: `${fresh.leagueSlug} registration`, playerEmail: fresh.playerEmail,
+    metadata: { reservationId: fresh._id.toString(), leagueSlug: fresh.leagueSlug, playerSlug: fresh.playerSlug },
+  }, { firstName: player.firstName, lastName: player.lastName, email: fresh.playerEmail, phone }, cardToken);
+
+  await Reservation.updateOne({ _id: fresh._id, paymentIntentId: fresh.paymentIntentId, status: { $in: PENDING } }, {
+    $set: { paymentIntentId: result.paymentIntentId },
+  });
+  if (result.status === "paid") await confirmPayment(result.paymentIntentId, "paid");
+  else if (result.status === "failed") {
+    const current = await findReservation(reservationId);
+    await transition(current, "failed");
+  }
+  return toDTO(await findReservation(reservationId));
 }
 export async function getPlayerReservations(email: string): Promise<ReservationDTO[]> {
   return (

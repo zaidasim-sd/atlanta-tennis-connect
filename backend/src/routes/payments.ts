@@ -11,6 +11,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { getPaymentProvider } from "../payment";
 import { confirmPayment, cancelReservation, reconcileReservation, resumeCheckout } from "../lib/reservationService";
+import { completeEzPayDirectPayment } from "../lib/reservationService";
 import { Reservation } from "../models/Reservation";
 import { wrap, ok, err } from "../lib/apiResponse";
 import { requireAuth, requireReservationOwner } from "../lib/auth";
@@ -20,7 +21,21 @@ const router = Router();
 router.post("/:reservationId/checkout", requireAuth, requireReservationOwner, wrap(async (req, res) => {
   const id = String(req.params.reservationId);
   res.setHeader("Cache-Control", "no-store");
-  ok(res, { ...await resumeCheckout(id), publishableKey: getPaymentProvider().name === "stripe" ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY : undefined });
+  const provider = getPaymentProvider().name;
+  const publishableKey = provider === "stripe"
+    ? process.env.STRIPE_PUBLISHABLE_KEY || process.env.VITE_STRIPE_PUBLISHABLE_KEY
+    : provider === "ezpaydirect" ? process.env.EZPAYDIRECT_PUBLISHABLE_KEY : undefined;
+  ok(res, { ...await resumeCheckout(id), publishableKey });
+}));
+
+// Card data is tokenized by EPD Elements in the browser. This route receives only
+// a short-lived cct_ token and creates the order with the server-side secret key.
+router.post("/:reservationId/ezpaydirect/confirm", requireAuth, requireReservationOwner, wrap(async (req, res) => {
+  const cardToken = typeof req.body?.cardToken === "string" ? req.body.cardToken : "";
+  if (!/^cct_[A-Za-z0-9_-]+$/.test(cardToken)) return err(res, "Invalid card token", 400);
+  const provider = getPaymentProvider();
+  if (provider.name !== "ezpaydirect") return err(res, "Easy Pay Direct is not active", 409);
+  ok(res, await completeEzPayDirectPayment(String(req.params.reservationId), cardToken));
 }));
 
 // Express Hosted Payments documents a validated browser redirect, not a webhook.
@@ -42,9 +57,11 @@ router.post("/:reservationId/hosted-return", requireAuth, requireReservationOwne
 
 // POST /api/payments/webhook
 // express.raw() must be applied BEFORE this route so rawBody is a Buffer
-router.post("/webhook", async (req: Request, res: Response) => {
+const handleWebhook = async (req: Request, res: Response) => {
   const provider = getPaymentProvider();
-  const sig = (req.headers["stripe-signature"] as string) ?? "";
+  const sig = provider.name === "ezpaydirect"
+    ? (req.headers["epd-signature"] as string) ?? ""
+    : (req.headers["stripe-signature"] as string) ?? "";
 
   let event;
   try {
@@ -70,7 +87,10 @@ router.post("/webhook", async (req: Request, res: Response) => {
   }
 
   ok(res, { received: true });
-});
+};
+
+router.post("/webhook", handleWebhook);
+router.post("/ezpaydirect/webhook", handleWebhook);
 
 // GET /api/payments/status/:reservationId
 router.get(

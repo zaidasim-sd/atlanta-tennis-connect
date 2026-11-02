@@ -1,7 +1,7 @@
 import * as React from "react";
 import { toast } from "sonner";
 import { Link, useNavigate, useLocation } from "@tanstack/react-router";
-import { Menu, X, LogOut, Copy, Check, LayoutDashboard, User, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TennisBall } from "@/components/tennis-ball";
 import { useStore } from "@/lib/store";
@@ -23,17 +23,7 @@ const navItems = [
 export function SiteHeader() {
   const { user, logout, dbConnected, fallbackActive, hydrated } = useStore();
   const [open, setOpen] = React.useState(false);
-  const [copiedId, setCopiedId] = React.useState(false);
   const navigate = useNavigate();
-
-  const handleCopyId = (id: string) => {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(id);
-      setCopiedId(true);
-      toast.success(`Player ID copied: ${id}`);
-      setTimeout(() => setCopiedId(false), 2000);
-    }
-  };
 
   const location = useLocation();
   const isOrganizerRoute = location.pathname.startsWith("/organizer");
@@ -97,10 +87,8 @@ export function SiteHeader() {
                     <span className="text-xs font-bold leading-tight text-foreground transition-colors group-hover:text-primary max-w-[120px] truncate">
                       {user.name}
                     </span>
-                    {!isOrganizer && user.playerId && (
-                      <span className="font-mono text-[10px] text-muted-foreground leading-tight">
-                        ID: {user.playerId}
-                      </span>
+                    {!isOrganizer && (
+                      <span className="text-[10px] text-muted-foreground leading-tight">Player account</span>
                     )}
                   </div>
                   <ChevronDown className="size-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 ml-0.5" />
@@ -128,30 +116,7 @@ export function SiteHeader() {
                       <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
                     </div>
                   </div>
-                  {!isOrganizer && user.playerId && (
-                    <div className="mt-2.5 flex items-center justify-between rounded-lg bg-background/90 px-2.5 py-1.5 border border-border/70 text-xs">
-                      <span className="font-mono text-[11px] text-muted-foreground truncate">
-                        ID: {user.playerId}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleCopyId(user.playerId!);
-                        }}
-                        className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                        title="Copy Player ID"
-                      >
-                        {copiedId ? (
-                          <Check className="size-3 text-emerald-600" />
-                        ) : (
-                          <Copy className="size-3" />
-                        )}
-                        <span>{copiedId ? "Copied" : "Copy"}</span>
-                      </button>
-                    </div>
-                  )}
+                  {!isOrganizer && <p className="mt-2 text-xs text-muted-foreground">Player account</p>}
                   {user.role === "organizer" && (
                     <div className="mt-2 text-center">
                       <span className="inline-block rounded bg-accent/20 px-2 py-0.5 text-[10px] font-bold uppercase text-accent-foreground">
@@ -260,17 +225,7 @@ export function SiteHeader() {
                         </span>
                       )}
                     </div>
-                    {!isOrganizer && user.playerId && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopyId(user.playerId!)}
-                        className="flex items-center gap-1.5 rounded-md bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground border border-border/50 hover:bg-muted/80 active:bg-muted transition-colors"
-                        title="Copy Player ID"
-                      >
-                        {copiedId ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3 text-muted-foreground" />}
-                        <span>ID: {user.playerId}</span>
-                      </button>
-                    )}
+                    {!isOrganizer && <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">Player account</span>}
                   </div>
                   <Button asChild onClick={() => setOpen(false)}>
                     <Link to={dashboardTo}>{user.role === "organizer" ? "Organizer Hub" : "My Dashboard"}</Link>

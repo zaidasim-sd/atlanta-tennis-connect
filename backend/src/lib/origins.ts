@@ -9,7 +9,7 @@ export function allowedOrigin(origin: string, host?: string) {
 }
 // Origin checks complement authentication and prevent cookie-based CSRF.
 export const protectOrigin: RequestHandler = (req, res, next) => {
-  if (req.path === "/api/payments/webhook") return next();
+  if (req.path === "/api/payments/webhook" || req.path === "/api/payments/ezpaydirect/webhook") return next();
   const origin = req.headers.origin;
   const host = req.headers.host;
   if (origin && !allowedOrigin(origin, host)) return err(res, "Origin not allowed", 403);

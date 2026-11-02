@@ -1,7 +1,7 @@
 /**
  * Returns the configured PaymentProvider singleton.
  * Reads PAYMENT_PROVIDER env at runtime so the same build can run
- * with "stripe", "worldpay", or "mock" without recompiling.
+ * with "stripe", "worldpay", "ezpaydirect", or "mock" without recompiling.
  */
 import type { PaymentProvider } from "./types";
 
@@ -11,7 +11,7 @@ export function getPaymentProvider(): PaymentProvider {
   if (_provider) return _provider;
 
   const name = (process.env.PAYMENT_PROVIDER ?? "stripe").toLowerCase();
-  if (name !== "stripe" && name !== "mock" && name !== "worldpay") throw new Error("Invalid PAYMENT_PROVIDER");
+  if (name !== "stripe" && name !== "mock" && name !== "worldpay" && name !== "ezpaydirect") throw new Error("Invalid PAYMENT_PROVIDER");
   const allowMockInProd =
     process.env.ALLOW_MOCK_PAYMENTS === "true" ||
     process.env.ALLOW_MOCK_IN_PRODUCTION === "true" ||
@@ -27,6 +27,9 @@ export function getPaymentProvider(): PaymentProvider {
   } else if (name === "worldpay") {
     const { WorldpayProvider } = require("./worldpayProvider") as typeof import("./worldpayProvider");
     _provider = new WorldpayProvider();
+  } else if (name === "ezpaydirect") {
+    const { EzPayDirectProvider } = require("./ezPayDirectProvider") as typeof import("./ezPayDirectProvider");
+    _provider = new EzPayDirectProvider();
   } else {
     const { MockProvider } = require("./mockProvider") as typeof import("./mockProvider");
     _provider = new MockProvider();

@@ -9,8 +9,9 @@
 import { Reservation } from "../models/Reservation";
 import { getPaymentProvider } from "../payment";
 import { reconcileReservation } from "../lib/reservationService";
+import { deliverRegistrationEmails } from "../lib/registrationEmail";
 
-export async function reconcilePayments(): Promise<{ reconciled: number; errors: number }> {
+async function reconcileProviderPayments(): Promise<{ reconciled: number; errors: number }> {
   // Skip reconciliation when using the mock provider – state is always current
   const provider = getPaymentProvider();
   if (provider.name === "mock") {
@@ -41,4 +42,12 @@ export async function reconcilePayments(): Promise<{ reconciled: number; errors:
 
   console.log(`[reconcile-job] Reconciled ${reconciled}, errors ${errors}`);
   return { reconciled, errors };
+}
+
+export async function reconcilePayments(): Promise<{ reconciled: number; errors: number }> {
+  const result = await reconcileProviderPayments();
+  // A mail outage must never prevent payment recovery.
+  try { await deliverRegistrationEmails(); }
+  catch { console.error("[registration-email] Cron delivery deferred"); }
+  return result;
 }

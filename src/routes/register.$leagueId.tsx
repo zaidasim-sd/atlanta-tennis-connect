@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { WorldpayCheckout } from "@/components/worldpay-checkout";
 import { StripeCheckoutForm } from "@/components/stripe-checkout-form";
+import { EzPayDirectCheckout } from "@/components/ezpaydirect-checkout";
 import { BallLoader } from "@/components/tennis-ball";
 
 const POPULAR_COURTS = [
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/register/$leagueId")({
 
 interface ActiveReservation {
   id: string;
-  paymentProvider?: "stripe" | "mock" | "worldpay";
+  paymentProvider?: "stripe" | "mock" | "worldpay" | "ezpaydirect";
   checkoutUrl?: string;
   clientSecret?: string;
   publishableKey: string;
@@ -575,10 +576,6 @@ function RegisterLeague() {
                 <span className="font-semibold text-foreground">{player.firstName} {player.lastName}</span>
               </div>
               <div className="flex justify-between border-b border-border/40 pb-2">
-                <span className="text-muted-foreground">Player ID</span>
-                <span className="font-mono text-xs font-bold text-primary">{player.id}</span>
-              </div>
-              <div className="flex justify-between border-b border-border/40 pb-2">
                 <span className="text-muted-foreground">Skill Rating Snapshot</span>
                 <span className="font-semibold text-foreground">NTRP {player.ntrp} (Snapshot)</span>
               </div>
@@ -725,9 +722,6 @@ function RegisterLeague() {
                   <p className="text-xs text-muted-foreground mt-0.5">Verified profile and skill snapshot</p>
                 </div>
               </div>
-              <span className="font-mono text-[11px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded border border-border/40">
-                ID: {player.id}
-              </span>
             </div>
 
             <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
@@ -798,7 +792,7 @@ function RegisterLeague() {
                             </span>
                           </div>
                           <p className="text-muted-foreground text-xs mt-0.5">
-                            Rating: NTRP {selectedPartner.ntrp} · <span className="font-mono text-[11px] font-semibold text-primary">ID: {selectedPartner.id}</span>
+                            Rating: NTRP {selectedPartner.ntrp}
                             {selectedPartner.email && <span> · {selectedPartner.email}</span>}
                           </p>
                         </div>
@@ -821,7 +815,7 @@ function RegisterLeague() {
                     <div ref={partnerContainerRef} className="relative">
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="block text-xs font-semibold text-foreground">
-                          Search by Player Name or Player ID
+                          Search by player name
                         </label>
                         {league?.skillLevel && (
                           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -1033,6 +1027,13 @@ function RegisterLeague() {
               <h3 className="font-bold text-lg mb-5">Secure Worldpay Checkout</h3>
               <WorldpayCheckout reservationId={reservation.id} checkoutUrl={reservation.checkoutUrl} onSuccess={handlePaymentSuccess} onCancel={handleCancelReservation} />
             </div>
+          ) : reservation?.paymentProvider === "ezpaydirect" && reservation.publishableKey ? (
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-md shadow-black/[0.04]">
+              <div className="mb-5 flex items-center gap-2 border-b border-border pb-4 text-primary">
+                <CreditCard className="size-5" /><h3 className="text-lg font-bold">Secure Easy Pay Direct Checkout</h3>
+              </div>
+              <EzPayDirectCheckout reservationId={reservation.id} publishableKey={reservation.publishableKey} amountCents={effectiveFeeCents} leagueName={league.name} busy={loading} onSuccess={handlePaymentSuccess} onCancel={handleCancelReservation} onError={setApiError} onProcessingChange={(value) => { paying.current = value; }} />
+            </div>
           ) : reservation && reservation.clientSecret ? (
             <div className="rounded-2xl border border-border bg-card p-6 shadow-md shadow-black/[0.04]">
               <div className="flex items-center justify-between mb-5 border-b border-border pb-4">
@@ -1092,7 +1093,7 @@ function RegisterLeague() {
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">Payment Processor</span>
-                  <span className="font-medium">Secure hosted checkout</span>
+                  <span className="font-medium">Secure card checkout</span>
                 </div>
                 <div className="flex justify-between items-center text-foreground">
                   <span className="text-muted-foreground">League Entry Fee</span>

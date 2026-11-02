@@ -162,17 +162,13 @@ function Dashboard() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header with Player ID and Name */}
+      {/* Player welcome */}
       <div className="flex flex-col gap-4 border-b border-border pb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Welcome back, {currentPlayer.firstName}!
             </h1>
-            <span className="inline-flex items-center gap-1 rounded font-mono text-[11px] text-muted-foreground bg-muted/60 px-2 py-0.5 border border-border/40">
-              <User className="size-3 text-muted-foreground/70" />
-              <span>ID: {currentPlayer.id}</span>
-            </span>
           </div>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Manage your registered leagues, confirmed entries, and player profile.
@@ -651,10 +647,6 @@ function Dashboard() {
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <h3 className="font-bold text-foreground">Player Profile</h3>
             <div className="mt-4 space-y-3 text-sm">
-              <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                <span className="text-muted-foreground">Player ID</span>
-                <span className="font-mono text-xs font-bold text-primary">{currentPlayer.id}</span>
-              </div>
               <div className="flex items-center justify-between border-b border-border/40 pb-2">
                 <span className="text-muted-foreground">Declared Skill</span>
                 <span className="font-semibold text-foreground">

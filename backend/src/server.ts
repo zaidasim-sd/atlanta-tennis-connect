@@ -24,6 +24,8 @@ import authRouter from "./routes/auth";
 import { allowedOrigin, protectOrigin } from "./lib/origins";
 import { expireReservations } from "./jobs/expireReservations";
 import { reconcilePayments } from "./jobs/reconcilePayments";
+import { deliverRegistrationEmails } from "./lib/registrationEmail";
+import { RegistrationEmail } from "./models/RegistrationEmail";
 import { wrap, ok, err } from "./lib/apiResponse";
 import { WebSocketServer, WebSocket } from "ws";
 import { capacityEvents } from "./lib/events";
@@ -56,6 +58,10 @@ app.use(
 // Webhook route needs raw body BEFORE json parser
 app.use(
   "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+);
+app.use(
+  "/api/payments/ezpaydirect/webhook",
   express.raw({ type: "application/json" }),
 );
 
@@ -101,7 +107,8 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
 if (require.main === module) {
   const PORT = parseInt(process.env.PORT ?? "3001", 10);
   connectDB()
-    .then(() => {
+    .then(async () => {
+      await RegistrationEmail.init();
       const server = app.listen(PORT, () => {
         console.log(`Atlanta Tennis API running on http://localhost:${PORT}`);
         console.log(`Payment provider: ${process.env.PAYMENT_PROVIDER ?? "mock"}`);
@@ -147,10 +154,20 @@ if (require.main === module) {
         }
       }, 30000);
 
+      let sendingEmails = false;
+      const emailInterval = setInterval(async () => {
+        if (sendingEmails) return;
+        sendingEmails = true;
+        try { await deliverRegistrationEmails(); }
+        catch { console.error("[registration-email] Background delivery deferred"); }
+        finally { sendingEmails = false; }
+      }, 30000);
+
       // Graceful shutdown
       const shutdown = async (signal: string) => {
         console.log(`\nReceived ${signal}. Shutting down API server gracefully...`);
         clearInterval(sweepInterval);
+        clearInterval(emailInterval);
         server.close(async () => {
           try {
             const mongoose = await import("mongoose");
