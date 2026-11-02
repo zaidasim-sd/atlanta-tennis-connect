@@ -32,6 +32,9 @@ function DemoDisclaimer() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    // Used only for shareable evidence captures. The persistent footer notice
+    // remains visible and normal visits still receive the acknowledgement.
+    if (new URLSearchParams(window.location.search).get("evidence") === "1") return;
     const now = Date.now();
     const lastShown = Number(window.localStorage.getItem(DISCLAIMER_LAST_SHOWN_KEY));
 
