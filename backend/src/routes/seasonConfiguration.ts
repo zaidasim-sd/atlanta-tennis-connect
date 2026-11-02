@@ -39,6 +39,34 @@ const optInBody = z.object({
   note: z.string().trim().max(1000).optional(),
 }).strict();
 
+const seasonOneCategories = [
+  { code: "men-singles", name: "Men's Singles", audience: "adult", partnerRequired: false },
+  { code: "women-singles", name: "Women's Singles", audience: "adult", partnerRequired: false },
+  { code: "men-doubles", name: "Men's Doubles", audience: "adult", partnerRequired: true },
+  { code: "women-doubles", name: "Women's Doubles", audience: "adult", partnerRequired: true },
+  { code: "mixed-doubles", name: "Mixed Doubles", audience: "adult", partnerRequired: true },
+  { code: "junior-singles", name: "Junior Singles", audience: "junior", partnerRequired: false },
+  { code: "junior-doubles", name: "Junior Doubles", audience: "junior", partnerRequired: true },
+];
+
+// Read-only app page data. This makes the Season One implementation visible
+// without exposing organizer-only configuration mutations.
+router.get("/season-one", wrap(async (_req, res) => {
+  const organization = await OrganizationProfile.findOneAndUpdate(
+    { key: "baseline-atl" },
+    { $setOnInsert: { legalEntityName: "Hyper Nexus Group LLC", operatorName: "Mr Saad Moudood" } },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  ).lean();
+  ok(res, {
+    organization,
+    operatingStates: ["active-season", "off-season", "standby"],
+    categories: seasonOneCategories,
+    cityDivisionFields: ["season", "city", "category", "skill level", "linked leagues", "manual placement"],
+    playoffOptInFields: ["player", "season", "city division", "opt in or opt out", "captured by", "date", "note"],
+    automation: { standings: "manual", playoffBrackets: "manual" },
+  });
+}));
+
 router.get("/organization", wrap(async (_req, res) => {
   const organization = await OrganizationProfile.findOneAndUpdate(
     { key: "baseline-atl" },

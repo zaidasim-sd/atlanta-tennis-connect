@@ -18,6 +18,7 @@ const navItems = [
   { to: "/", label: "Home" },
   { to: "/leagues", label: "Browse leagues" },
   { to: "/how-it-works", label: "How it works" },
+  { to: "/season-one", label: "Season One" },
 ] as const;
 
 export function SiteHeader() {

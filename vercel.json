@@ -9,6 +9,7 @@
     { "source": "/api/seasons/:path+", "destination": "/api/season-configuration" },
     { "source": "/api/playoff-opt-ins", "destination": "/api/season-configuration" },
     { "source": "/api/playoff-opt-ins/:path+", "destination": "/api/season-configuration" },
+    { "source": "/api/season-one", "destination": "/api/season-one" },
     { "source": "/api/organization", "destination": "/api/season-configuration" }
   ],
   "crons": [
