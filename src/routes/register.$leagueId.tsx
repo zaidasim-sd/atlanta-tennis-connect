@@ -1032,7 +1032,7 @@ function RegisterLeague() {
               <div className="mb-5 flex items-center gap-2 border-b border-border pb-4 text-primary">
                 <CreditCard className="size-5" /><h3 className="text-lg font-bold">Secure Easy Pay Direct Checkout</h3>
               </div>
-              <EzPayDirectCheckout reservationId={reservation.id} publishableKey={reservation.publishableKey} amountCents={effectiveFeeCents} leagueName={league.name} busy={loading} onSuccess={handlePaymentSuccess} onCancel={handleCancelReservation} onError={setApiError} onProcessingChange={(value) => { paying.current = value; }} />
+              <EzPayDirectCheckout reservationId={reservation.id} publishableKey={reservation.publishableKey} amountCents={effectiveFeeCents} leagueName={league.name} phone={player.phone ?? ""} busy={loading} onSuccess={handlePaymentSuccess} onCancel={handleCancelReservation} onError={setApiError} onProcessingChange={(value) => { paying.current = value; }} />
             </div>
           ) : reservation && reservation.clientSecret ? (
             <div className="rounded-2xl border border-border bg-card p-6 shadow-md shadow-black/[0.04]">

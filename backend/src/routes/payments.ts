@@ -33,9 +33,11 @@ router.post("/:reservationId/checkout", requireAuth, requireReservationOwner, wr
 router.post("/:reservationId/ezpaydirect/confirm", requireAuth, requireReservationOwner, wrap(async (req, res) => {
   const cardToken = typeof req.body?.cardToken === "string" ? req.body.cardToken : "";
   if (!/^cct_[A-Za-z0-9_-]+$/.test(cardToken)) return err(res, "Invalid card token", 400);
+  const phone = typeof req.body?.phone === "string" ? req.body.phone.trim() : undefined;
+  if (phone && phone.length > 32) return err(res, "Invalid phone number", 400);
   const provider = getPaymentProvider();
   if (provider.name !== "ezpaydirect") return err(res, "Easy Pay Direct is not active", 409);
-  ok(res, await completeEzPayDirectPayment(String(req.params.reservationId), cardToken));
+  ok(res, await completeEzPayDirectPayment(String(req.params.reservationId), cardToken, phone));
 }));
 
 // Express Hosted Payments documents a validated browser redirect, not a webhook.

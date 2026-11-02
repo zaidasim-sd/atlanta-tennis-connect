@@ -13,6 +13,7 @@ interface Props {
   reservationId: string;
   amountCents: number;
   leagueName: string;
+  phone?: string;
   busy: boolean;
   onSuccess: () => Promise<void> | void;
   onCancel: () => Promise<void> | void;
@@ -43,6 +44,12 @@ export function EzPayDirectCheckout(props: Props) {
   const [ready, setReady] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState("");
+  const [phone, setPhone] = useState(props.phone ?? "");
+
+  const phoneIsValid = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    return digits.length === 10 || (value.trim().startsWith("+") && digits.length >= 8 && digits.length <= 15);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -69,12 +76,17 @@ export function EzPayDirectCheckout(props: Props) {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!element.current || processing) return;
+    if (!phoneIsValid(phone)) {
+      const text = "Enter a valid US phone number to continue with Easy Pay Direct.";
+      setMessage(text); props.onError(text);
+      return;
+    }
     setProcessing(true); props.onProcessingChange(true); setMessage("");
     try {
       const { token } = await element.current.epd.createToken(element.current.card);
       const response = await fetch(getApiUrl(`/api/payments/${props.reservationId}/ezpaydirect/confirm`), {
         method: "POST", credentials: "include", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cardToken: token }),
+        body: JSON.stringify({ cardToken: token, phone: phone.trim() }),
       });
       const json = await response.json();
       if (!response.ok || !json.ok) throw new Error(json.error || "Payment could not be completed.");
@@ -91,9 +103,23 @@ export function EzPayDirectCheckout(props: Props) {
 
   return <form onSubmit={submit} className="space-y-4">
     <p className="text-sm text-muted-foreground">Enter your card in Easy Pay Direct's secure card field. Card details do not pass through Baseline ATL.</p>
+    <div>
+      <label htmlFor="epd-phone" className="mb-1.5 block text-sm font-medium text-foreground">Mobile number</label>
+      <input
+        id="epd-phone"
+        type="tel"
+        autoComplete="tel"
+        value={phone}
+        onChange={(event) => setPhone(event.target.value)}
+        placeholder="(404) 555-0100"
+        className="block w-full rounded-xl border border-input bg-background px-3 py-3 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        required
+      />
+      <p className="mt-1.5 text-xs text-muted-foreground">Easy Pay Direct requires a phone number for the payment customer record.</p>
+    </div>
     <div id="epd-card-field" className="rounded-xl border border-input bg-background px-3 py-4" />
     {message && <p role="alert" className="text-sm text-destructive">{message}</p>}
-    <Button type="submit" className="w-full rounded-full font-bold" disabled={!ready || processing || props.busy}>
+    <Button type="submit" className="w-full rounded-full font-bold" disabled={!ready || processing || props.busy || !phoneIsValid(phone)}>
       {processing ? "Processing payment…" : `Pay ${formatMoney(props.amountCents)} for ${props.leagueName}`}
     </Button>
     <Button type="button" variant="ghost" className="w-full text-xs" disabled={processing || props.busy} onClick={props.onCancel}>Cancel reservation and release spot</Button>

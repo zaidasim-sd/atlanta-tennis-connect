@@ -418,7 +418,11 @@ function normaliseE164(phone: string): string | null {
 }
 
 /** Charges an EPD Elements token. The raw card number never reaches this server. */
-export async function completeEzPayDirectPayment(reservationId: string, cardToken: string): Promise<ReservationDTO> {
+export async function completeEzPayDirectPayment(
+  reservationId: string,
+  cardToken: string,
+  phoneInput?: string,
+): Promise<ReservationDTO> {
   const r = await findReservation(reservationId);
   if (!PENDING.includes(r.status)) return toDTO(r);
   const provider = getPaymentProvider();
@@ -429,8 +433,14 @@ export async function completeEzPayDirectPayment(reservationId: string, cardToke
   if (!fresh.paymentIntentId?.startsWith("epd_pending_")) return reconcileReservation(reservationId);
 
   const player = await Player.findOne({ slug: fresh.playerSlug });
-  const phone = normaliseE164(player?.phone ?? "");
+  const phone = normaliseE164(phoneInput?.trim() || player?.phone || "");
   if (!player || !phone) throw error("Add a valid phone number to your profile before paying", 400);
+  // EPD requires an E.164 customer phone number. Persist the normalised value so
+  // a player does not have to re-enter it on later registrations.
+  if (player.phone !== phone) {
+    player.phone = phone;
+    await player.save();
+  }
   const result = await provider.chargeCardToken({
     reservationId: fresh._id.toString(), amountCents: fresh.amountCents, currency: "usd",
     description: `${fresh.leagueSlug} registration`, playerEmail: fresh.playerEmail,
