@@ -58,6 +58,21 @@ export const SEASONS = [
 
 export const LEAGUES = [
   {
+    slug: "l-s1-buckhead-wd35", seasonSlug: "s-fall-26", name: "Buckhead Women Doubles", format: "women-doubles" as const, skillLevel: "3.5" as const, feeCents: 4000,
+    scheduleDay: "Tuesday", scheduleTime: "6:30 PM", venue: "Bitsy Grant Tennis Center", playerLimit: 24, spotsRemaining: 24, registrationOpen: true,
+    description: "Season One women doubles division in Buckhead.", startDate: "2026-11-10", endDate: "2026-12-19",
+  },
+  {
+    slug: "l-s1-decatur-js30", seasonSlug: "s-fall-26", name: "Decatur Junior Singles", format: "junior-singles" as const, skillLevel: "3.0" as const, feeCents: 2500,
+    scheduleDay: "Saturday", scheduleTime: "10:00 AM", venue: "McKoy Park Courts", playerLimit: 20, spotsRemaining: 20, registrationOpen: true,
+    description: "Season One junior singles division in Decatur.", startDate: "2026-11-14", endDate: "2026-12-19",
+  },
+  {
+    slug: "l-s1-alpharetta-jd30", seasonSlug: "s-fall-26", name: "Alpharetta Junior Doubles", format: "junior-doubles" as const, skillLevel: "3.0" as const, feeCents: 3000,
+    scheduleDay: "Sunday", scheduleTime: "2:00 PM", venue: "Webb Bridge Park Courts", playerLimit: 20, spotsRemaining: 20, registrationOpen: true,
+    description: "Season One junior doubles division in Alpharetta.", startDate: "2026-11-15", endDate: "2026-12-20",
+  },
+  {
     slug: "l-2",
     seasonSlug: "s-fall-26",
     name: "Thursday Mixed Doubles",
