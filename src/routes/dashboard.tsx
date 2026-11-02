@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { BallLoader } from "@/components/tennis-ball";
+import { PlayoffOptInCard } from "@/components/playoff-opt-in";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatDateRange, formatMoney, FORMAT_LABELS, type League, type Match, type MatchResult } from "@/lib/tennis";
+import { getApiUrl } from "@/lib/store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
@@ -68,6 +70,17 @@ function Dashboard() {
   const [set3Opponent, setSet3Opponent] = React.useState("7");
   const [winnerChoice, setWinnerChoice] = React.useState<"player" | "opponent">("player");
 
+  // ── Real backend stats ──────────────────────────────────────────────────────
+  const [backendStats, setBackendStats] = React.useState<{
+    matchesPlayed: number;
+    wins: number;
+    losses: number;
+    winRate: number;
+  } | null>(null);
+  const [backendResults, setBackendResults] = React.useState<any[]>([]);
+  const [statsLoading, setStatsLoading] = React.useState(false);
+  const [statsError, setStatsError] = React.useState(false);
+
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -75,6 +88,41 @@ function Dashboard() {
       navigate({ to: "/organizer" });
     }
   }, [hydrated, user, navigate]);
+
+  // Fetch real stats once we know who the player is
+  React.useEffect(() => {
+    if (!hydrated || !user || user.role === "organizer") return;
+    const playerSlug = user.playerId;
+    if (!playerSlug) return;
+
+    setStatsLoading(true);
+    setStatsError(false);
+
+    const statsPromise = fetch(
+      getApiUrl(`/api/match-results/stats/${encodeURIComponent(playerSlug)}`),
+      { credentials: "include" },
+    ).then(async (r) => {
+      const json = await r.json();
+      if (r.ok && json.ok && json.data) setBackendStats(json.data);
+      else setBackendStats({ matchesPlayed: 0, wins: 0, losses: 0, winRate: 0 });
+    });
+
+    const resultsPromise = fetch(
+      getApiUrl(`/api/match-results?player=${encodeURIComponent(playerSlug)}`),
+      { credentials: "include" },
+    ).then(async (r) => {
+      const json = await r.json();
+      if (r.ok && json.ok && Array.isArray(json.data)) {
+        setBackendResults(json.data.filter((r: any) => r.status === "finalized"));
+      } else {
+        setBackendResults([]);
+      }
+    });
+
+    Promise.all([statsPromise, resultsPromise])
+      .catch(() => setStatsError(true))
+      .finally(() => setStatsLoading(false));
+  }, [hydrated, user]);
 
   if (!hydrated) {
     return (
@@ -234,7 +282,7 @@ function Dashboard() {
                           {isPaid ? (
                             <span className="inline-flex items-center text-xs font-semibold text-emerald-600">
                               <CheckCircle className="mr-1 size-3.5" />
-                              {status === "confirmed" ? "Confirmed" : "Awaiting Placement"}
+                              Confirmed
                             </span>
                           ) : (
                             <span className="inline-flex items-center text-xs font-semibold text-amber-600">
@@ -273,6 +321,17 @@ function Dashboard() {
                 })
               )}
             </div>
+
+            {/* Playoff Opt-In & City Division Card */}
+            {myRegistrations.length > 0 && (
+              <div className="mt-6">
+                <PlayoffOptInCard
+                  seasonSlug={myRegistrations[0] ? getLeagueDetails(myRegistrations[0].leagueId).season?.id || "s-fall-26" : "s-fall-26"}
+                  seasonName={myRegistrations[0] ? getLeagueDetails(myRegistrations[0].leagueId).season?.name || "Season One" : "Season One"}
+                  registeredCategory={myRegistrations[0] ? getLeagueDetails(myRegistrations[0].leagueId).league?.format : undefined}
+                />
+              </div>
+            )}
           </div>
 
           {/* Match Fixture Section (Future Concept outside V1) */}
@@ -512,11 +571,11 @@ function Dashboard() {
                   const hasConfirmedReg = myRegistrations.some(
                     (r) => r.registrationStatus === "confirmed" || r.paymentStatus === "paid" || r.paymentStatus === "succeeded"
                   );
-                  const hasAwaitingPlacementReg = myRegistrations.some(
-                    (r) => r.registrationStatus === "awaiting-review" || r.paymentStatus === "pending"
+                  const hasPendingPaymentReg = myRegistrations.some(
+                    (r) => r.paymentStatus === "not-started" || (r.paymentStatus as string) === "pending"
                   );
 
-                  // STATE 1: Registration confirmed, no match scheduled
+                  // STATE 1: Registration confirmed, spot secured
                   if (hasConfirmedReg) {
                     return (
                       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
@@ -530,7 +589,7 @@ function Dashboard() {
                           Your registration is confirmed.
                         </h3>
                         <p className="mt-1 text-sm font-semibold text-foreground">
-                          League entry confirmed.
+                          League entry confirmed. Spot secured.
                         </p>
                         <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
                           Your spot in the league is secured. Your player registration and profile are active for the season.
@@ -539,24 +598,24 @@ function Dashboard() {
                     );
                   }
 
-                  // STATE 2: Awaiting placement
-                  if (hasAwaitingPlacementReg) {
+                  // STATE 2: Payment pending / processing
+                  if (hasPendingPaymentReg) {
                     return (
                       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
                         <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-600">
                           <Clock className="size-6" />
                         </div>
                         <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-0.5 text-xs font-bold text-amber-700">
-                          Awaiting Placement
+                          Payment Pending
                         </div>
                         <h3 className="mt-3 text-lg font-bold text-foreground">
-                          Your registration has been received.
+                          Payment is processing
                         </h3>
                         <p className="mt-1 text-sm font-semibold text-foreground">
-                          Registration in progress.
+                          Reservation hold active
                         </p>
                         <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
-                          The league organizer is currently reviewing registrations and capacity based on skill level and geographic area.
+                          Your reservation is held while payment verification completes. Once verified, your league spot is confirmed immediately.
                         </p>
                       </div>
                     );
@@ -591,43 +650,54 @@ function Dashboard() {
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 <Trophy className="size-4 text-primary" /> My Stats
               </h3>
-              <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[9px] font-bold text-amber-700 uppercase tracking-wider">
-                Future Concept
-              </span>
+              {statsLoading && (
+                <span className="text-[10px] font-semibold text-muted-foreground animate-pulse">Loading…</span>
+              )}
             </div>
 
-            {stats.matchesPlayed > 0 ? (
+            {statsLoading ? (
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="rounded-xl bg-muted/50 p-3 text-center animate-pulse h-16" />
+                ))}
+              </div>
+            ) : statsError ? (
+              <div className="mt-4 text-center py-4">
+                <p className="text-xs text-destructive">Unable to load stats. Check your connection.</p>
+              </div>
+            ) : backendStats && backendStats.matchesPlayed > 0 ? (
               <div className="mt-4 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-xl bg-muted/50 p-3 text-center">
                     <span className="text-[10px] font-bold uppercase text-muted-foreground">Matches</span>
-                    <p className="mt-1 text-2xl font-bold text-foreground">{stats.matchesPlayed}</p>
+                    <p className="mt-1 text-2xl font-bold text-foreground">{backendStats.matchesPlayed}</p>
                   </div>
-                  <div className="rounded-xl bg-muted/50 p-3 text-center">
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Win Rate</span>
-                    <p className="mt-1 text-2xl font-bold text-primary">{stats.winRate}%</p>
+                  <div className="rounded-xl bg-primary/10 p-3 text-center">
+                    <span className="text-[10px] font-bold uppercase text-primary">Win Rate</span>
+                    <p className="mt-1 text-2xl font-bold text-primary">{backendStats.winRate}%</p>
                   </div>
                   <div className="rounded-xl bg-emerald-500/10 p-3 text-center">
                     <span className="text-[10px] font-bold uppercase text-emerald-700">Wins</span>
-                    <p className="mt-1 text-2xl font-bold text-emerald-600">{stats.wins}</p>
+                    <p className="mt-1 text-2xl font-bold text-emerald-600">{backendStats.wins}</p>
                   </div>
                   <div className="rounded-xl bg-muted/50 p-3 text-center">
                     <span className="text-[10px] font-bold uppercase text-muted-foreground">Losses</span>
-                    <p className="mt-1 text-2xl font-bold text-muted-foreground">{stats.losses}</p>
+                    <p className="mt-1 text-2xl font-bold text-muted-foreground">{backendStats.losses}</p>
                   </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground text-center">
-                  Based on verified, accepted match results in active seasons.
+                  Based on organizer-verified finalized results.
                 </p>
               </div>
             ) : (
-              <div className="mt-4 text-center py-4">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Player match statistics and standings are planned for future league releases.
-                </p>
-                <div className="mt-3 rounded-lg border border-border/60 bg-muted/30 p-2.5 text-[11px] text-muted-foreground">
-                  V1 includes player profiles, capacity tracking, and confirmed registrations. Match statistics are not included in V1.
+              <div className="mt-4 text-center py-5">
+                <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground mb-3">
+                  <Trophy className="size-5 text-muted-foreground/60" />
                 </div>
+                <p className="text-sm font-semibold text-foreground">No verified results yet</p>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
+                  Your statistics will appear here once your organizer records your match results.
+                </p>
               </div>
             )}
 
@@ -863,82 +933,83 @@ function Dashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 Matches Played
               </span>
-              <p className="mt-1 text-3xl font-bold text-foreground">{stats.matchesPlayed}</p>
+              <p className="mt-1 text-3xl font-bold text-foreground">{backendStats?.matchesPlayed ?? 0}</p>
             </div>
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-center shadow-sm">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
                 Official Wins
               </span>
-              <p className="mt-1 text-3xl font-bold text-emerald-600">{stats.wins}</p>
+              <p className="mt-1 text-3xl font-bold text-emerald-600">{backendStats?.wins ?? 0}</p>
             </div>
             <div className="rounded-xl border border-border bg-card p-3.5 text-center shadow-sm">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 Losses
               </span>
-              <p className="mt-1 text-3xl font-bold text-muted-foreground">{stats.losses}</p>
+              <p className="mt-1 text-3xl font-bold text-muted-foreground">{backendStats?.losses ?? 0}</p>
             </div>
             <div className="rounded-xl border border-primary/30 bg-primary/10 p-3.5 text-center shadow-sm">
               <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                 Win Rate
               </span>
-              <p className="mt-1 text-3xl font-bold text-primary">{stats.winRate}%</p>
+              <p className="mt-1 text-3xl font-bold text-primary">{backendStats?.winRate ?? 0}%</p>
             </div>
           </div>
 
           {/* Match Results History */}
           <div className="mt-6 space-y-3">
-            <h4 className="text-sm font-bold text-foreground">Verified & Submitted Match Breakdown</h4>
+            <h4 className="text-sm font-bold text-foreground">Verified Match History</h4>
 
-            {myResults.length > 0 ? (
+            {backendResults.length > 0 ? (
               <div className="space-y-3">
-                {myResults.map((res: MatchResult) => {
-                  const match = matches.find((m: Match) => m.id === res.matchId) || myMatches.find((m: Match) => m.id === res.matchId);
-                  const isWinner = res.winnerId === currentPlayer.id;
+                {backendResults.map((res: any) => {
+                  const mySlug = user?.playerId || currentPlayer.id;
+                  const isASide = res.playerASlug === mySlug || res.playerAPartnerSlug === mySlug;
+                  const isWinner =
+                    (isASide && res.winningSide === "A") ||
+                    (!isASide && res.winningSide === "B");
+
+                  const opponentLabel = isASide
+                    ? `${res.playerBName}${res.playerBPartnerName ? ` / ${res.playerBPartnerName}` : ""}`
+                    : `${res.playerAName}${res.playerAPartnerName ? ` / ${res.playerAPartnerName}` : ""}`;
+
+                  const sets = [res.set1, res.set2, ...(res.set3 ? [res.set3] : [])];
+                  const scoreStr = sets
+                    .map((s: any) => `${isASide ? s.playerA : s.playerB}–${isASide ? s.playerB : s.playerA}`)
+                    .join("  ");
+
+                  const leagueName = leagues.find((l) => l.id === res.leagueSlug || (l as any).slug === res.leagueSlug)?.name || res.leagueSlug;
 
                   return (
                     <div
-                      key={res.resultId}
+                      key={res.id}
                       className="rounded-xl border border-border bg-card p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                     >
-                      <div className="space-y-1">
+                      <div className="space-y-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${isWinner ? "bg-emerald-500/20 text-emerald-700" : "bg-muted text-muted-foreground"
-                              }`}
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+                              isWinner ? "bg-emerald-500/20 text-emerald-700" : "bg-muted text-muted-foreground"
+                            }`}
                           >
                             {isWinner ? "WIN" : "LOSS"}
                           </span>
-                          <span className="font-bold text-sm text-foreground">
-                            vs {match?.opponentName || "League Opponent"}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            ({match?.opponentLevel ? `NTRP ${match.opponentLevel}` : "NTRP 3.5"})
+                          <span className="font-bold text-sm text-foreground truncate">
+                            vs {opponentLabel}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {match?.court || "Piedmont Park Courts"} · {match?.matchDate || "Recent fixture"}
+                          {leagueName} · {res.matchDate}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-border/40">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-border/40 shrink-0">
                         <div className="text-right">
-                          <span className="font-mono text-base font-bold text-foreground block">
-                            {res.scoreData}
-                          </span>
+                          <span className="font-mono text-base font-bold text-foreground block">{scoreStr}</span>
                           <span className="text-[10px] text-muted-foreground">Set Scores</span>
                         </div>
-
-                        <div>
-                          {res.status === "accepted" ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-                              <CheckCircle className="size-3" /> Verified
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-[11px] font-bold text-amber-700">
-                              <Clock className="size-3" /> Awaiting Review
-                            </span>
-                          )}
-                        </div>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+                          <CheckCircle className="size-3" /> Verified
+                        </span>
                       </div>
                     </div>
                   );
@@ -949,16 +1020,16 @@ function Dashboard() {
                 <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
                   <Trophy className="size-6 text-muted-foreground/60" />
                 </div>
-                <h5 className="mt-3 text-sm font-bold text-foreground">No Match Results Yet</h5>
+                <h5 className="mt-3 text-sm font-bold text-foreground">No verified results yet</h5>
                 <p className="mt-1 text-xs text-muted-foreground max-w-sm mx-auto">
-                  Match coordination and score reporting are outside the current V1 release. Confirmed registrations and league entries are shown in your dashboard.
+                  No verified match results yet. Your statistics will appear here once your organizer records your match results.
                 </p>
               </div>
             )}
           </div>
 
           <div className="mt-4 rounded-xl bg-muted/40 p-3 text-[11px] text-muted-foreground leading-relaxed">
-            <strong>Scope Notice:</strong> Automated fixtures, score submission, standings, and rankings are scheduled for future platform updates and not included in V1.
+            <strong>Season One:</strong> Statistics shown here are derived from organizer-entered match results. Official standings, playoff qualification, and rankings remain manually administered by league organizers.
           </div>
 
           <DialogFooter className="mt-4">

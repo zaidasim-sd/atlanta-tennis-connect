@@ -47,6 +47,8 @@ const seasonOneCategories = [
   { code: "mixed-doubles", name: "Mixed Doubles", audience: "adult", partnerRequired: true },
   { code: "junior-singles", name: "Junior Singles", audience: "junior", partnerRequired: false },
   { code: "junior-doubles", name: "Junior Doubles", audience: "junior", partnerRequired: true },
+  { code: "senior-singles", name: "Senior Singles", audience: "adult", partnerRequired: false },
+  { code: "senior-doubles", name: "Senior Doubles", audience: "adult", partnerRequired: true },
 ];
 
 // Read-only app page data. This makes the Season One implementation visible
@@ -74,6 +76,24 @@ router.get("/organization", wrap(async (_req, res) => {
     { upsert: true, new: true, setDefaultsOnInsert: true },
   ).lean();
   ok(res, organization);
+}));
+
+router.get("/seasons", wrap(async (_req, res) => {
+  const seasons = await Season.find({}).sort({ startDate: 1 }).lean();
+  ok(res, seasons.map(s => ({
+    id: s.slug,
+    name: s.name,
+    startDate: s.startDate,
+    endDate: s.endDate,
+    status: s.status,
+    operatingState: s.operatingState || (s.status === "active" ? "active-season" : "standby"),
+  })));
+}));
+
+router.get("/city-divisions", wrap(async (req, res) => {
+  const seasonSlug = (req.query.seasonSlug as string) || "s-fall-26";
+  const divisions = await CityDivision.find({ seasonSlug }).sort({ city: 1, name: 1 }).lean();
+  ok(res, divisions);
 }));
 
 router.get("/seasons/:seasonSlug/configuration", requireAuth, wrap(async (req, res) => {

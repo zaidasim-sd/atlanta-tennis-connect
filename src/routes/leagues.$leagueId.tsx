@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { useStore } from "@/lib/store";
 import { FORMAT_LABELS, formatDate, formatDateRange, formatMoney } from "@/lib/tennis";
-import { DemoBanner } from "@/components/demo-banner";
 import { BallLoader } from "@/components/tennis-ball";
 
 export const Route = createFileRoute("/leagues/$leagueId")({

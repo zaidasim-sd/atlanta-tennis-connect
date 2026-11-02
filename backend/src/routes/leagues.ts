@@ -110,6 +110,7 @@ router.get(
             startDate: seasonMap[l.seasonSlug].startDate,
             endDate: seasonMap[l.seasonSlug].endDate,
             status: seasonMap[l.seasonSlug].status,
+            operatingState: (seasonMap[l.seasonSlug] as any).operatingState || "active-season",
           }
         : null,
     }));
@@ -136,6 +137,7 @@ router.get(
             startDate: season.startDate,
             endDate: season.endDate,
             status: season.status,
+            operatingState: (season as any).operatingState || "active-season",
           }
         : null,
     });

@@ -22,6 +22,7 @@ import paymentsRouter from "./routes/payments";
 import playersRouter from "./routes/players";
 import authRouter from "./routes/auth";
 import seasonConfigurationRouter from "./routes/seasonConfiguration";
+import matchResultsRouter from "./routes/matchResults";
 import { allowedOrigin, protectOrigin } from "./lib/origins";
 import { expireReservations } from "./jobs/expireReservations";
 import { reconcilePayments } from "./jobs/reconcilePayments";
@@ -82,6 +83,7 @@ app.use("/api/payments", paymentsRouter);
 app.use("/api/players", playersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api", seasonConfigurationRouter);
+app.use("/api/match-results", matchResultsRouter);
 app.get("/api/cron/:job", wrap(async (req, res) => {
   if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
     return err(res, "Unauthorized", 401);

@@ -154,9 +154,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         let format: LeagueFormat = "men-singles";
         const rawFormat = String(l.format || "").toLowerCase().trim();
         if (rawFormat === "women-singles") format = "women-singles";
-        else if (rawFormat === "men-doubles" || rawFormat === "senior-doubles" || rawFormat === "junior-doubles" || rawFormat === "doubles") format = "men-doubles";
+        else if (rawFormat === "women-doubles") format = "women-doubles";
+        else if (rawFormat === "senior-singles") format = "senior-singles";
+        else if (rawFormat === "senior-doubles") format = "senior-doubles";
+        else if (rawFormat === "junior-singles") format = "junior-singles";
+        else if (rawFormat === "junior-doubles") format = "junior-doubles";
         else if (rawFormat === "mixed-doubles") format = "mixed-doubles";
-        else if (rawFormat === "men-singles" || rawFormat === "senior-singles" || rawFormat === "junior-singles" || rawFormat === "singles") format = "men-singles";
+        else if (rawFormat === "men-doubles" || rawFormat === "doubles") format = "men-doubles";
+        else if (rawFormat === "men-singles" || rawFormat === "singles") format = "men-singles";
 
         let skillLevel: SkillLevel = "3.5";
         const rawSkill = String(l.skillLevel || "").trim();
@@ -191,11 +196,29 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         };
       });
 
-      console.info("🎾 [DB_CONNECTED] Successfully loaded live leagues from MongoDB backend.");
+      // Extract live seasons with operatingState from backend
+      const seasonsFromApi: Season[] = [];
+      const seasonSeen = new Set<string>();
+      for (const item of json.data) {
+        if (item.season && !seasonSeen.has(item.season.id)) {
+          seasonSeen.add(item.season.id);
+          seasonsFromApi.push({
+            id: item.season.id,
+            name: item.season.name,
+            startDate: item.season.startDate,
+            endDate: item.season.endDate,
+            status: item.season.status,
+            operatingState: item.season.operatingState || "active-season",
+          });
+        }
+      }
+
+      console.info("🎾 [DB_CONNECTED] Successfully loaded live leagues and season state from MongoDB backend.");
 
       setState((prev) => ({
         ...prev,
         leagues: dbLeagues,
+        seasons: seasonsFromApi.length > 0 ? seasonsFromApi : prev.seasons,
         dbConnected: true,
         fallbackActive: false,
       }));

@@ -20,7 +20,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { DemoBanner } from "@/components/demo-banner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -120,11 +119,6 @@ function Index() {
                 <Link to="/leagues">View all leagues</Link>
               </Button>
             </div>
-
-            <DemoBanner
-              message="Featured leagues shown here are sample data for demonstration purposes only."
-              className="mt-6"
-            />
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featuredLeagues.map((league) => (

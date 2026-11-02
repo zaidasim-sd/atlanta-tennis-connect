@@ -18,10 +18,11 @@ export function LeagueCard({
   const { user, registrations } = useStore();
   const isRegistered = user ? registrations.some((r) => r.playerId === user.playerId && r.leagueId === league.id) : false;
   const isFull = spotsLeft <= 0;
-  const isClosed = !league.registrationOpen;
+  const isSeasonStandby = season?.operatingState === "standby";
+  const isSeasonOff = season?.operatingState === "off-season";
+  const isClosed = !league.registrationOpen || isSeasonStandby || isSeasonOff;
 
-  const cleanTitle = league.name.replace(/^(Midtown|Buckhead|Decatur|Cumming|Marietta|Westside|Sandy Springs|Alpharetta|East Atlanta|Peachtree)\s+/i, "");
-  const cleanSeason = season?.name?.replace(/\s*(Metro|Indoor|Premier)?\s*Season/i, "") || season?.name;
+  const seasonName = season?.name || "Season One";
   const cleanSkill = (league.skillLevel as string).replace("+", "");
 
   return (
@@ -36,6 +37,14 @@ export function LeagueCard({
         {isRegistered ? (
           <span className="rounded-full bg-primary/10 border border-primary/30 px-3 py-1 text-xs font-bold text-primary">
             ✓ Enrolled
+          </span>
+        ) : isSeasonStandby ? (
+          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-400">
+            Season Standby
+          </span>
+        ) : isSeasonOff ? (
+          <span className="rounded-full border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
+            Off-Season
           </span>
         ) : isClosed ? (
           <span className="rounded-full border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -52,8 +61,8 @@ export function LeagueCard({
         )}
       </div>
 
-      <h3 className="mt-4 text-xl font-bold text-foreground">{cleanTitle}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{cleanSeason}</p>
+      <h3 className="mt-4 text-xl font-bold text-foreground">{league.name}</h3>
+      <p className="mt-1 text-sm text-muted-foreground">{seasonName}</p>
 
       <dl className="mt-5 space-y-2.5 text-sm text-muted-foreground">
         {/* Metro Area / Locality & Venue */}
@@ -106,7 +115,18 @@ export function LeagueCard({
             </Link>
           ) : (
             <Link to="/leagues/$leagueId" params={{ leagueId: league.id }}>
-              {isRegistered ? "View Details" : isClosed ? "View details" : isFull ? "Full · View" : "Register"} <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
+              {isRegistered
+                ? "View Details"
+                : isSeasonStandby
+                  ? "Standby · Details"
+                  : isSeasonOff
+                    ? "Off-Season · Details"
+                    : isClosed
+                      ? "View details"
+                      : isFull
+                        ? "Full · View"
+                        : "Register"}{" "}
+              <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
           )}
         </Button>

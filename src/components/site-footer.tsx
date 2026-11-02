@@ -66,6 +66,22 @@ export function SiteFooter() {
                     My dashboard
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/season-one"
+                    className="transition-colors hover:text-accent"
+                  >
+                    Season One
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/terms"
+                    className="transition-colors hover:text-accent"
+                  >
+                    Terms of Use
+                  </Link>
+                </li>
               </ul>
             </div>
           )}
@@ -81,6 +97,14 @@ export function SiteFooter() {
                   className="transition-colors hover:text-accent"
                 >
                   Organizer hub
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms"
+                  className="transition-colors hover:text-accent"
+                >
+                  Terms & Policies
                 </Link>
               </li>
               {isOrganizer ? (
@@ -119,16 +143,32 @@ export function SiteFooter() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          {/* Demo disclaimer — single line, white */}
-          <p className="overflow-hidden whitespace-nowrap border-b border-white/10 py-3 text-center text-[10px] leading-relaxed text-white">
-            Demo Notice: This website is an MVP demonstration. All leagues, dates, prices, locations, availability, and other content shown are for demonstration purposes only and do not represent live data.
-          </p>
+          {/* Court-booking disclaimer & Demo notice */}
+          <div className="border-b border-white/10 py-3.5 text-center text-[11px] leading-relaxed text-white/70 space-y-1">
+            <p>
+              <strong className="text-white font-medium">Court-Booking Disclaimer:</strong> Baseline ATL provides league registration, scheduling, and administration only. Players are individually responsible for arranging and booking their own courts for scheduled matches. Baseline ATL is not responsible for individual court bookings, reservations, or court availability.
+            </p>
+            <p className="text-[10px] text-white/50">
+              Demo Notice: This website is an MVP demonstration. All leagues, dates, prices, locations, and availability shown are for demonstration purposes only.
+            </p>
+          </div>
 
           {/* Copyright + Powered by */}
-          <div className="flex flex-col items-center gap-3 pt-8 pb-5 sm:flex-row sm:justify-between sm:gap-0">
-            <p className="text-xs text-white">
-              © {new Date().getFullYear()} Baseline ATL. Atlanta, Georgia.
-            </p>
+          <div className="flex flex-col items-center gap-3 pt-6 pb-5 sm:flex-row sm:justify-between sm:gap-0">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <p className="text-xs text-white">
+                © {new Date().getFullYear()} Baseline ATL · <strong className="font-normal text-white">Hyper Nexus Group LLC, operated by Mr Saad Moudood</strong>. Atlanta, Georgia.
+              </p>
+              <div className="flex items-center gap-3 text-[11px] text-white/60">
+                <Link to="/terms" className="hover:text-accent transition-colors underline-offset-4 hover:underline">
+                  Terms of Use & Court Booking Policy
+                </Link>
+                <span>·</span>
+                <Link to="/season-one" className="hover:text-accent transition-colors underline-offset-4 hover:underline">
+                  Season One Operations
+                </Link>
+              </div>
+            </div>
 
             {/* Vision71 branding */}
             <div className="flex items-center">

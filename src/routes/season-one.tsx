@@ -23,6 +23,8 @@ const DEFAULT_SEASON_ONE: SeasonOneData = {
     { code: "mixed-doubles", name: "Mixed Doubles", audience: "adult", partnerRequired: true },
     { code: "junior-singles", name: "Junior Singles", audience: "junior", partnerRequired: false },
     { code: "junior-doubles", name: "Junior Doubles", audience: "junior", partnerRequired: true },
+    { code: "senior-singles", name: "Senior Singles", audience: "adult", partnerRequired: false },
+    { code: "senior-doubles", name: "Senior Doubles", audience: "adult", partnerRequired: true },
   ],
   cityDivisionFields: ["season", "city", "category", "skill level", "linked leagues", "manual placement"],
   playoffOptInFields: ["player", "season", "city division", "opt in or opt out", "captured by", "date", "note"],

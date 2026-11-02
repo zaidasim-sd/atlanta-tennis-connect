@@ -10,7 +10,9 @@ export type LeagueFormat =
   | "women-doubles"
   | "junior-singles"
   | "junior-doubles"
-  | "mixed-doubles";
+  | "mixed-doubles"
+  | "senior-singles"
+  | "senior-doubles";
 
 export type SkillLevel = "2.5" | "3.0" | "3.5" | "4.0" | "4.5" | "5.0";
 
@@ -226,6 +228,8 @@ export const FORMAT_LABELS: Record<LeagueFormat, string> = {
   "junior-singles": "Junior Singles",
   "junior-doubles": "Junior Doubles",
   "mixed-doubles": "Mixed Doubles",
+  "senior-singles": "Senior Singles",
+  "senior-doubles": "Senior Doubles",
 };
 
 export const FORMAT_DETAILS: Record<LeagueFormat, { teamSize: number; partnerRequired: boolean }> = {
@@ -236,6 +240,8 @@ export const FORMAT_DETAILS: Record<LeagueFormat, { teamSize: number; partnerReq
   "junior-singles": { teamSize: 1, partnerRequired: false },
   "junior-doubles": { teamSize: 2, partnerRequired: true },
   "mixed-doubles": { teamSize: 2, partnerRequired: true },
+  "senior-singles": { teamSize: 1, partnerRequired: false },
+  "senior-doubles": { teamSize: 2, partnerRequired: true },
 };
 
 export const SKILL_LEVELS: SkillLevel[] = ["2.5", "3.0", "3.5", "4.0", "4.5", "5.0"];

@@ -438,6 +438,9 @@ function RegisterLeague() {
 
   const handlePaymentSuccess = async () => {
     if (!reservation) return;
+    // Registration is confirmed by the backend via the verified payment provider.
+    // Do NOT call /api/registrations/confirm — that endpoint is intentionally removed (410).
+    // Reconcile ensures the backend marks the reservation as registered after payment.
     try {
       if (!reservation.clientSecret?.includes("mock")) {
         const res = await fetch(getApiUrl(`/api/payments/${reservation.id}/reconcile`), {
@@ -445,30 +448,12 @@ function RegisterLeague() {
           credentials: "include",
         });
         const json = await res.json();
-        if (!res.ok || !json.ok) throw new Error(json.error || "Verification pending.");
+        if (!res.ok || !json.ok) {
+          console.warn("Payment reconcile note:", json.error || "Verification pending — registration will be confirmed by webhook.");
+        }
       }
     } catch (e) {
       console.warn("Payment reconcile note:", e);
-    }
-
-    // Always ensure registration is confirmed on backend database API
-    try {
-      await fetch(getApiUrl("/api/registrations/confirm"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          leagueId: league.id,
-          playerEmail: user.email,
-          playerName: `${player.firstName} ${player.lastName}`.trim(),
-          ntrp: player.ntrp,
-          phone: player.phone,
-          preferredCourt,
-          amountCents: effectiveFeeCents,
-        }),
-      });
-    } catch (e) {
-      console.warn("Backend confirm registration fallback note:", e);
     }
 
     registerPlayer({
@@ -612,6 +597,40 @@ function RegisterLeague() {
             </Button>
             <Button asChild variant="outline" size="lg" className="flex-1 rounded-full">
               <Link to="/leagues">Browse More Leagues</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Standby & Off-Season Protection ──────────────────────────────────────
+  const isSeasonClosed = season?.operatingState && season.operatingState !== "active-season";
+  if (isSeasonClosed || !league.registrationOpen) {
+    const isStandby = season?.operatingState === "standby";
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600">
+            <Clock className="size-7" />
+          </div>
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-0.5 text-xs font-bold text-amber-700">
+            {isStandby ? "Season Standby" : "Off-Season / Closed"}
+          </div>
+          <h2 className="mt-4 text-2xl font-bold text-foreground">
+            {isStandby ? "Registration is on Standby" : "Registration is Currently Closed"}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {isStandby
+              ? `We are currently in the pre-season standby window for ${season.name}. League schedules, division allocations, and court pairings are being finalized. Registration will open shortly.`
+              : `Competition matches are underway for ${season.name}. New registrations are locked until the upcoming season opens.`}
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild className="rounded-full">
+              <Link to="/leagues">Browse All Leagues</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link to="/dashboard">Go to Dashboard</Link>
             </Button>
           </div>
         </div>

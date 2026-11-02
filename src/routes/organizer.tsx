@@ -53,6 +53,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PlayoffBracket } from "@/components/playoff-bracket";
+import { OrganizerMatchResults } from "@/components/organizer-match-results";
 
 function cleanLeagueName(name: string): string {
   if (!name) return "";
@@ -69,10 +70,14 @@ function cleanVenue(venue: string): string {
 }
 
 export const Route = createFileRoute("/organizer")({
+  validateSearch: (search: Record<string, unknown>): { tab?: string | undefined } => ({
+    tab: typeof search["tab"] === "string" ? (search["tab"] as string) : undefined,
+  }),
   component: OrganizerHub,
 });
 
 function OrganizerHub() {
+  const search = Route.useSearch();
   const {
     hydrated,
     user,
@@ -90,7 +95,15 @@ function OrganizerHub() {
   } = useStore();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<"leagues" | "scores" | "geography" | "bracket" | "create">("leagues");
+  const [activeTab, setActiveTab] = useState<"leagues" | "scores" | "geography" | "bracket" | "create" | "results">(
+    search.tab === "results" ? "results" : "leagues"
+  );
+
+  useEffect(() => {
+    if (search.tab && ["leagues", "scores", "geography", "bracket", "create", "results"].includes(search.tab)) {
+      setActiveTab(search.tab as any);
+    }
+  }, [search.tab]);
   const [directScoreMatchId, setDirectScoreMatchId] = useState<string | null>(null);
   const [directScoreText, setDirectScoreText] = useState("6-4, 6-3");
   const [directWinnerId, setDirectWinnerId] = useState("");
@@ -357,6 +370,26 @@ function OrganizerHub() {
             <span>Future Concept - Not Included in V1</span>
           </button>
           */}
+
+          <button
+            id="tab-match-results"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "results"}
+            className={cn(
+              "flex items-center gap-2 border-b-2 py-3 px-3 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors -mb-px",
+              activeTab === "results"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
+            )}
+            onClick={(e) => {
+              setActiveTab("results");
+              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }}
+          >
+            <Trophy className="size-4 shrink-0 text-amber-500" />
+            <span>Match Results</span>
+          </button>
 
           <button
             type="button"
@@ -631,6 +664,19 @@ function OrganizerHub() {
             </div>
           </div>
         </div>
+      )}
+
+      {activeTab === "results" && (
+        <OrganizerMatchResults
+          leagues={leagues.map((l) => ({
+            id: l.id,
+            slug: (l as any).slug || l.id,
+            name: l.name,
+            format: l.format,
+            seasonId: l.seasonId,
+          }))}
+          seasons={seasons.map((s) => ({ id: s.id, name: s.name }))}
+        />
       )}
 
       {/* Future Concept - Not Included in V1: Score Verification (hidden for V1) */}
