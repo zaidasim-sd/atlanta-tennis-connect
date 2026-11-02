@@ -5,7 +5,11 @@
     { "source": "/api/leagues/:path+", "destination": "/api/leagues" },
     { "source": "/api/players/:path+", "destination": "/api/players" },
     { "source": "/api/payments/:path+", "destination": "/api/payments" },
-    { "source": "/api/registrations/:path+", "destination": "/api/registrations" }
+    { "source": "/api/registrations/:path+", "destination": "/api/registrations" },
+    { "source": "/api/seasons/:path+", "destination": "/api/season-configuration" },
+    { "source": "/api/playoff-opt-ins", "destination": "/api/season-configuration" },
+    { "source": "/api/playoff-opt-ins/:path+", "destination": "/api/season-configuration" },
+    { "source": "/api/organization", "destination": "/api/season-configuration" }
   ],
   "crons": [
     { "path": "/api/cron/expire", "schedule": "0 0 * * *" },

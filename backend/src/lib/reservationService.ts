@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { League } from "../models/League";
+import { Season } from "../models/Season";
 import { Player } from "../models/Player";
 import { Account } from "../models/Auth";
 import { Reservation, type IReservation, type ReservationStatus } from "../models/Reservation";
@@ -98,6 +99,18 @@ export async function createReservation(
   if (!reservation) {
     try {
       await mongoose.connection.transaction(async (session) => {
+        // A legacy active season without an operatingState remains eligible
+        // until it is migrated. All newly configured seasons must be explicit.
+        const leagueForSeason = await League.findOne({ slug: input.leagueSlug })
+          .select("seasonSlug")
+          .lean()
+          .session(session);
+        const season = leagueForSeason
+          ? await Season.findOne({ slug: leagueForSeason.seasonSlug }).lean().session(session)
+          : null;
+        if (!season || season.status !== "active" || (season.operatingState && season.operatingState !== "active-season")) {
+          throw error("Registration is not open for this season", 409);
+        }
         const league = await League.findOneAndUpdate(
           { slug: input.leagueSlug, spotsRemaining: { $gt: 0 }, $or: [{ registrationDeadline: { $gt: new Date() } }, { registrationDeadline: { $exists: false }, registrationOpen: true }] },
           { $inc: { spotsRemaining: -1 } },
@@ -171,6 +184,8 @@ export async function createReservation(
               partnerSlug,
               status: "held",
               amountCents: league.feeCents,
+              legalEntityName: "Hyper Nexus Group LLC",
+              merchantOperatorName: "Mr Saad Moudood",
               paymentProvider: provider.name,
               idempotencyKey: id.toString(),
               heldAt: now,

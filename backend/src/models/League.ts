@@ -5,6 +5,9 @@ export type LeagueFormat =
   | "men-singles"
   | "women-singles"
   | "men-doubles"
+  | "women-doubles"
+  | "junior-singles"
+  | "junior-doubles"
   | "mixed-doubles";
 
 export type SkillLevel = "2.5" | "3.0" | "3.5" | "4.0" | "4.5" | "5.0";
@@ -44,6 +47,9 @@ const LeagueSchema = new Schema<ILeague>(
         "men-singles",
         "women-singles",
         "men-doubles",
+        "women-doubles",
+        "junior-singles",
+        "junior-doubles",
         "mixed-doubles",
       ],
       required: true,

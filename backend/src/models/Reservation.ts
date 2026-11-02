@@ -39,6 +39,10 @@ export interface IReservation extends Document {
   status: ReservationStatus;
   amountCents: number;
 
+  // Merchant record snapshot retained with each payment-related reservation.
+  legalEntityName: string;
+  merchantOperatorName: string;
+
   // Payment provider fields
   paymentProvider: "stripe" | "mock" | "worldpay" | "ezpaydirect";
   paymentIntentId?: string;    // Stripe PaymentIntent ID or mock equivalent
@@ -73,6 +77,8 @@ const ReservationSchema = new Schema<IReservation>(
       index: true,
     },
     amountCents:      { type: Number, required: true, min: 0 },
+    legalEntityName:  { type: String, required: true, default: "Hyper Nexus Group LLC" },
+    merchantOperatorName: { type: String, required: true, default: "Mr Saad Moudood" },
 
     paymentProvider:  { type: String, enum: ["stripe","mock","worldpay","ezpaydirect"], required: true },
     paymentIntentId:  { type: String, index: true, sparse: true },

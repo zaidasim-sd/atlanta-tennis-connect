@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const mongoose = require("mongoose");
 const { MongoMemoryReplSet } = require("mongodb-memory-server");
 const { League } = require("../dist/models/League");
+const { Season } = require("../dist/models/Season");
 const { Reservation } = require("../dist/models/Reservation");
 const { Player } = require("../dist/models/Player");
 const { AuditLog } = require("../dist/models/AuditLog");
@@ -53,6 +54,7 @@ before(async () => {
   await mongoose.connect(db.getUri());
   await Promise.all([
     League.init(),
+    Season.init(),
     Reservation.init(),
     Player.init(),
     AuditLog.init(),
@@ -66,6 +68,7 @@ after(async () => {
 beforeEach(async () => {
   await Promise.all([
     League.deleteMany({}),
+    Season.deleteMany({}),
     Reservation.deleteMany({}),
     Player.deleteMany({}),
     AuditLog.deleteMany({}),
@@ -74,6 +77,7 @@ beforeEach(async () => {
   cancelFails = false;
   paymentWins = false;
   createFails = false;
+  await Season.create({ slug: "s-test", name: "Test Season", startDate: "2026-01-01", endDate: "2026-12-31", status: "active", operatingState: "active-season" });
   await League.create({
     slug: "l-test",
     seasonSlug: "s-test",

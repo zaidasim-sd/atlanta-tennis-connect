@@ -7,6 +7,9 @@ export type LeagueFormat =
   | "men-singles"
   | "women-singles"
   | "men-doubles"
+  | "women-doubles"
+  | "junior-singles"
+  | "junior-doubles"
   | "mixed-doubles";
 
 export type SkillLevel = "2.5" | "3.0" | "3.5" | "4.0" | "4.5" | "5.0";
@@ -50,6 +53,7 @@ export interface Season {
   startDate: string; // ISO
   endDate: string; // ISO
   status: SeasonStatus;
+  operatingState?: "active-season" | "off-season" | "standby";
 }
 
 export interface League {
@@ -218,6 +222,9 @@ export const FORMAT_LABELS: Record<LeagueFormat, string> = {
   "men-singles": "Men's Singles",
   "women-singles": "Women's Singles",
   "men-doubles": "Men's Doubles",
+  "women-doubles": "Women's Doubles",
+  "junior-singles": "Junior Singles",
+  "junior-doubles": "Junior Doubles",
   "mixed-doubles": "Mixed Doubles",
 };
 
@@ -225,6 +232,9 @@ export const FORMAT_DETAILS: Record<LeagueFormat, { teamSize: number; partnerReq
   "men-singles": { teamSize: 1, partnerRequired: false },
   "women-singles": { teamSize: 1, partnerRequired: false },
   "men-doubles": { teamSize: 2, partnerRequired: true },
+  "women-doubles": { teamSize: 2, partnerRequired: true },
+  "junior-singles": { teamSize: 1, partnerRequired: false },
+  "junior-doubles": { teamSize: 2, partnerRequired: true },
   "mixed-doubles": { teamSize: 2, partnerRequired: true },
 };
 

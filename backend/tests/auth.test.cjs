@@ -12,6 +12,7 @@ const { Account, AuthSession, AuthAttempt } = require("../dist/models/Auth");
 const { Player } = require("../dist/models/Player");
 const { Reservation } = require("../dist/models/Reservation");
 const { League } = require("../dist/models/League");
+const { Season } = require("../dist/models/Season");
 const { AuditLog } = require("../dist/models/AuditLog");
 const { hashPassword } = require("../dist/lib/auth");
 const payments = require("../dist/payment");
@@ -39,14 +40,14 @@ async function request(path, { method = "GET", who, body, origin = process.env.C
 before(async () => {
   db = await MongoMemoryReplSet.create({ replSet: { count: 1 }, binary: { version: "7.0.14" } });
   await mongoose.connect(db.getUri());
-  await Promise.all([Account, AuthSession, AuthAttempt, Player, Reservation, League, AuditLog].map(m => m.init()));
+  await Promise.all([Account, AuthSession, AuthAttempt, Player, Reservation, League, Season, AuditLog].map(m => m.init()));
   encoded = await hashPassword(password);
   server = app.listen(0, "127.0.0.1");
   await new Promise(resolve => server.once("listening", resolve));
   base = `http://127.0.0.1:${server.address().port}`;
 });
 beforeEach(async () => {
-  await Promise.all([Account, AuthSession, AuthAttempt, Player, Reservation, League, AuditLog].map(m => m.deleteMany({})));
+  await Promise.all([Account, AuthSession, AuthAttempt, Player, Reservation, League, Season, AuditLog].map(m => m.deleteMany({})));
   intents.clear(); providerCalls = 0;
   for (const name of ["a", "b", "org"]) {
     await Player.create({ slug: `p-${name}`, email: `${name}@example.test`, firstName: name, lastName: "Private", phone: "555-1234", ntrp: "3.5", city: "Atlanta" });
@@ -55,6 +56,7 @@ beforeEach(async () => {
     await AuthSession.create({ accountId: account._id, tokenHash: crypto.createHash("sha256").update(token).digest("hex"), expiresAt: new Date(Date.now() + 60000) });
     cookies[name] = `__Host-atl-session=${token}`;
   }
+  await Season.create({ slug: "s-sec", name: "Security Season", startDate: "2026-01-01", endDate: "2026-12-31", status: "active", operatingState: "active-season" });
   await League.create({ slug: "l-sec", seasonSlug: "s-sec", name: "Security test", format: "men-singles", skillLevel: "3.5", feeCents: 100, scheduleDay: "Tuesday", scheduleTime: "6 PM", venue: "Test", playerLimit: 3, spotsRemaining: 3 });
 });
 after(async () => { if (server) await new Promise(resolve => server.close(resolve)); await mongoose.disconnect(); if (db) await db.stop(); });
